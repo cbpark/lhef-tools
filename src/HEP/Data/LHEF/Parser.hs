@@ -80,10 +80,10 @@ parseParticleEntries = many1 $ parseParticle <* endOfLine
 parseEvent :: Parser Event
 parseEvent = do
   skipSpace
-  string $ pack "<event>"
+  _ <- string $ pack "<event>"
   evInfo <- parseEventInfo
   parEntries <- parseParticleEntries
-  string $ pack "</event>"
+  _ <- string $ pack "</event>"
 
   let parMap = fromList $ zip [1..] parEntries
   return (evInfo, parMap)
