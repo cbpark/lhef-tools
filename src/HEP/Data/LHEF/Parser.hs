@@ -16,8 +16,6 @@ import HEP.Data.LHEF
 parseEventInfo :: Parser EventInfo
 parseEventInfo = do
   skipSpace
-  string $ pack "<init>"
-  skipSpace
   nup' <- signed decimal
   skipSpace
   idprup' <- signed decimal
@@ -29,8 +27,6 @@ parseEventInfo = do
   aqedup' <- double
   skipSpace
   aqcdup' <- double
-  skipSpace
-  string $ pack "</init>"
 
   return EventInfo { nup = nup'
                    , idprup = idprup'
