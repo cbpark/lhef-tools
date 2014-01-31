@@ -72,9 +72,9 @@ type ParticleMap = Map.Map ParIdx Particle
 
 type Event = (EventInfo, ParticleMap)
 
-fourMomentum :: Particle -> FV.FourVector
+fourMomentum :: Particle -> FV.FourVector Double
 fourMomentum (Particle {pup = (x, y, z, e, _)}) =
-    FV.FourVector { FV.vt = e, FV.vx = x, FV.vy = y, FV.vz = z }
+    FV.FourVector e x y z
 
 px :: Particle -> Double
 px (Particle {pup = (x, _, _, _, _)}) = x

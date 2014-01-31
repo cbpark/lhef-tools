@@ -9,6 +9,7 @@ import qualified Data.ByteString.Lazy.Char8 as C
 import           Data.Attoparsec.ByteString.Lazy (parse, Result(..))
 import           Data.List (partition)
 import           Data.Double.Conversion.ByteString (toFixed)
+import           Linear.Vector ((^+^), zero)
 
 import           HEP.Data.LHEF
 import           HEP.Data.LHEF.Parser (parseEvent)
@@ -44,7 +45,7 @@ groupFinalStates pm = partition
 
 invMass :: [Particle] -> B.ByteString
 invMass ps = toFixed 3 $
-             FV.invariantMass $ foldr (FV.add . fourMomentum) FV.null4 ps
+             FV.invariantMass $ foldr ((^+^) . fourMomentum) zero ps
 
 visible :: Particle -> Bool
 visible (Particle {idup = pid}) = abs pid `elem` [5, 11, 13, 15]
