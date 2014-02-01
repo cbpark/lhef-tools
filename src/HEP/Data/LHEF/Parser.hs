@@ -1,6 +1,5 @@
 module HEP.Data.LHEF.Parser
-    ( parseEventInfo
-    , parseEvent
+    ( parseEvent
     , parseAllEvents
     ) where
 
@@ -61,9 +60,9 @@ parseParticle = do
   skipSpace
   pup5' <- double
   skipSpace
-  vtimup' <- doubleWithTrailingDot
+  vtimup' <- double
   skipSpace
-  spinup' <- doubleWithTrailingDot
+  spinup' <- double
 
   return Particle { idup   = idup'
                   , istup  = istup'
@@ -92,6 +91,7 @@ parseAllEvents :: Parser [Event]
 parseAllEvents = many1 $ parseEvent <* endOfLine
 
 -- | Parse a double number with a trailing dot (ex. 3.).
+-- Deprecated as of attoparsec 0.11
 doubleWithTrailingDot :: Parser Double
 doubleWithTrailingDot = do
   d <- double
