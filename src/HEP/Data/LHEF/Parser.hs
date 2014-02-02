@@ -1,13 +1,11 @@
 module HEP.Data.LHEF.Parser
     ( parseEvent
-    , parseAllEvents
     ) where
 
 import Data.Attoparsec.ByteString.Char8 (Parser, skipSpace, signed, string,
-                                         char, decimal, double, many1,
-                                         endOfLine)
+                                         decimal, double, many1, endOfLine)
 import Data.ByteString.Char8 (pack)
-import Control.Applicative ((<*), (<|>))
+import Control.Applicative ((<*))
 import Data.Map (fromList)
 
 import HEP.Data.LHEF
@@ -86,14 +84,3 @@ parseEvent = do
 
   let parMap = fromList $ zip [1..] parEntries
   return (evInfo, parMap)
-
-parseAllEvents :: Parser [Event]
-parseAllEvents = many1 $ parseEvent <* endOfLine
-
--- | Parse a double number with a trailing dot (ex. 3.).
--- Deprecated as of attoparsec 0.11
-doubleWithTrailingDot :: Parser Double
-doubleWithTrailingDot = do
-  d <- double
-  char '.' >> return () <|> return ()    -- Remove the trailing dot.
-  return d
