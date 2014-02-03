@@ -21,7 +21,7 @@ module HEP.Data.LHEF
     , daughters
     ) where
 
-import qualified HEP.Vector.FourVector as FV
+import qualified HEP.Vector.LorentzVector as V4
 import qualified Data.Map as Map
 import           Data.List (nub)
 
@@ -72,9 +72,9 @@ type ParticleMap = Map.Map ParIdx Particle
 
 type Event = (EventInfo, ParticleMap)
 
-fourMomentum :: Particle -> FV.FourVector Double
+fourMomentum :: Particle -> V4.LorentzVector Double
 fourMomentum (Particle {pup = (x, y, z, e, _)}) =
-    FV.FourVector e x y z
+    V4.LorentzVector e x y z
 
 px :: Particle -> Double
 px (Particle {pup = (x, _, _, _, _)}) = x
@@ -95,10 +95,10 @@ pt :: Particle -> Double
 pt (Particle {pup = (x, y, _, _, _)}) = sqrt $ x*x + y*y
 
 eta :: Particle -> Double
-eta = FV.eta . fourMomentum
+eta = V4.eta . fourMomentum
 
 phi :: Particle -> Double
-phi = FV.phi . fourMomentum
+phi = V4.phi . fourMomentum
 
 finalStates :: ParticleMap -> [Particle]
 finalStates = Map.elems . Map.filter (\Particle {istup=s} -> s == 1)
