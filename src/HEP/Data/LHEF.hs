@@ -24,7 +24,7 @@ module HEP.Data.LHEF
     ) where
 
 import qualified HEP.Vector.LorentzVector as V4
-import qualified Data.Map as Map
+import qualified Data.IntMap as IntMap
 import           Data.List (nub)
 
 data EventInfo = EventInfo
@@ -70,7 +70,7 @@ instance Ord Particle where
 
 type ParIdx = Int
 
-type ParticleMap = Map.Map ParIdx Particle
+type ParticleMap = IntMap.IntMap Particle
 
 type Event = (EventInfo, ParticleMap)
 
@@ -103,11 +103,11 @@ phi :: Particle -> Double
 phi = V4.phi . fourMomentum
 
 finalStates :: ParticleMap -> [Particle]
-finalStates = Map.elems . Map.filter (\Particle { .. } -> istup == 1)
+finalStates = IntMap.elems . IntMap.filter (\Particle { .. } -> istup == 1)
 
 mother :: ParticleMap -> Particle -> Maybe Particle
 mother pm Particle { mothup = (m, _) } | m `elem` [1, 2] = Nothing
-                                     | otherwise         = Map.lookup m pm
+                                     | otherwise         = IntMap.lookup m pm
 
 mothers :: ParticleMap -> Maybe Particle -> [Particle]
 mothers pm (Just p) = p : mothers pm (mother pm p)
@@ -118,4 +118,4 @@ initialStates pm = nub $ map (ancenstor pm) $ finalStates pm
     where ancenstor pm' p' = last $ mothers pm' (Just p')
 
 daughters :: (ParIdx, Particle) -> ParticleMap -> [Particle]
-daughters (i, _) = Map.elems . Map.filter (\Particle { .. } -> fst mothup == i)
+daughters (i, _) = IntMap.elems . IntMap.filter (\Particle { .. } -> fst mothup == i)

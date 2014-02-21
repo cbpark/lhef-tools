@@ -6,7 +6,7 @@ import Data.Attoparsec.ByteString.Char8 (Parser, skipSpace, signed, string,
                                          decimal, double, many1, endOfLine)
 import Data.ByteString.Char8 (pack)
 import Control.Applicative ((<*))
-import Data.Map (fromList)
+import Data.IntMap (fromList)
 
 import HEP.Data.LHEF
 
