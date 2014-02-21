@@ -1,3 +1,5 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module HEP.Data.LHEF
     ( EventInfo(..)
     , Particle(..)
@@ -73,26 +75,26 @@ type ParticleMap = Map.Map ParIdx Particle
 type Event = (EventInfo, ParticleMap)
 
 fourMomentum :: Particle -> V4.LorentzVector Double
-fourMomentum (Particle {pup = (x, y, z, e, _)}) =
+fourMomentum Particle { pup = (x, y, z, e, _) } =
     V4.LorentzVector e x y z
 
 px :: Particle -> Double
-px (Particle {pup = (x, _, _, _, _)}) = x
+px Particle { pup = (x, _, _, _, _) } = x
 
 py :: Particle -> Double
-py (Particle {pup = (_, y, _, _, _)}) = y
+py Particle { pup = (_, y, _, _, _) } = y
 
 pz :: Particle -> Double
-pz (Particle {pup = (_, _, z, _, _)}) = z
+pz Particle { pup = (_, _, z, _, _) } = z
 
 energy :: Particle -> Double
-energy (Particle {pup = (_, _, _, e, _)}) = e
+energy Particle { pup = (_, _, _, e, _) } = e
 
 mass :: Particle -> Double
-mass (Particle {pup = (_, _, _, _, m)}) = m
+mass Particle { pup = (_, _, _, _, m) } = m
 
 pt :: Particle -> Double
-pt (Particle {pup = (x, y, _, _, _)}) = sqrt $ x*x + y*y
+pt Particle { pup = (x, y, _, _, _) } = sqrt $ x*x + y*y
 
 eta :: Particle -> Double
 eta = V4.eta . fourMomentum
@@ -101,11 +103,11 @@ phi :: Particle -> Double
 phi = V4.phi . fourMomentum
 
 finalStates :: ParticleMap -> [Particle]
-finalStates = Map.elems . Map.filter (\Particle {istup=s} -> s == 1)
+finalStates = Map.elems . Map.filter (\Particle { .. } -> istup == 1)
 
 mother :: ParticleMap -> Particle -> Maybe Particle
-mother pm (Particle {mothup=(m, _)}) | m `elem` [1, 2] = Nothing
-                                     | otherwise       = Map.lookup m pm
+mother pm Particle { mothup = (m, _) } | m `elem` [1, 2] = Nothing
+                                     | otherwise         = Map.lookup m pm
 
 mothers :: ParticleMap -> Maybe Particle -> [Particle]
 mothers pm (Just p) = p : mothers pm (mother pm p)
@@ -116,4 +118,4 @@ initialStates pm = nub $ map (ancenstor pm) $ finalStates pm
     where ancenstor pm' p' = last $ mothers pm' (Just p')
 
 daughters :: (ParIdx, Particle) -> ParticleMap -> [Particle]
-daughters (i, _) = Map.elems . Map.filter (\Particle {mothup=m} -> fst m == i)
+daughters (i, _) = Map.elems . Map.filter (\Particle { .. } -> fst mothup == i)
