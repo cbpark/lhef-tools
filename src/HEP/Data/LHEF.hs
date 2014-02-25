@@ -24,8 +24,9 @@ module HEP.Data.LHEF
     ) where
 
 import qualified HEP.Vector.LorentzVector as V4
+
 import qualified Data.IntMap as IntMap
-import           Data.List (nub)
+import qualified Data.Set    as S
 
 data EventInfo = EventInfo
     { -- | Number of particle entries in the event.
@@ -107,15 +108,17 @@ finalStates = IntMap.elems . IntMap.filter (\Particle { .. } -> istup == 1)
 
 mother :: ParticleMap -> Particle -> Maybe Particle
 mother pm Particle { mothup = (m, _) } | m `elem` [1, 2] = Nothing
-                                     | otherwise         = IntMap.lookup m pm
+                                       | otherwise       = IntMap.lookup m pm
 
 mothers :: ParticleMap -> Maybe Particle -> [Particle]
 mothers pm (Just p) = p : mothers pm (mother pm p)
 mothers _  Nothing  = []
 
 initialStates :: ParticleMap -> [Particle]
-initialStates pm = nub $ map (ancenstor pm) $ finalStates pm
+initialStates pm = noDups $ map (ancenstor pm) $ finalStates pm
     where ancenstor pm' p' = last $ mothers pm' (Just p')
+          noDups           = S.toList . S.fromList
 
 daughters :: (ParIdx, Particle) -> ParticleMap -> [Particle]
-daughters (i, _) = IntMap.elems . IntMap.filter (\Particle { .. } -> fst mothup == i)
+daughters (i, _) = IntMap.elems .
+                   IntMap.filter (\Particle { .. } -> fst mothup == i)
