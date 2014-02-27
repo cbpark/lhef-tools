@@ -23,7 +23,7 @@ module HEP.Data.LHEF
     , daughters
     ) where
 
-import qualified HEP.Vector.LorentzVector as V4
+import           HEP.Vector.LorentzVector
 
 import qualified Data.IntMap as IntMap
 import           Data.List (nub)
@@ -75,9 +75,9 @@ type ParticleMap = IntMap.IntMap Particle
 
 type Event = (EventInfo, ParticleMap)
 
-fourMomentum :: Particle -> V4.LorentzVector Double
+fourMomentum :: Particle -> LorentzVector Double
 fourMomentum Particle { pup = (x, y, z, e, _) } =
-    V4.LorentzVector e x y z
+    LorentzVector e x y z
 
 px :: Particle -> Double
 px Particle { pup = (x, _, _, _, _) } = x
@@ -96,12 +96,6 @@ mass Particle { pup = (_, _, _, _, m) } = m
 
 pt :: Particle -> Double
 pt Particle { pup = (x, y, _, _, _) } = sqrt $ x*x + y*y
-
-eta :: Particle -> Double
-eta = V4.eta . fourMomentum
-
-phi :: Particle -> Double
-phi = V4.phi . fourMomentum
 
 finalStates :: ParticleMap -> [Particle]
 finalStates = IntMap.elems . IntMap.filter (\Particle { .. } -> istup == 1)
