@@ -14,8 +14,6 @@ module HEP.Data.LHEF
     , energy
     , mass
     , pt
-    , eta
-    , phi
 
     , finalStates
     , mothers
