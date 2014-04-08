@@ -8,23 +8,16 @@ module HEP.Data.LHEF
     , Event
 
     , fourMomentum
-    , px
-    , py
-    , pz
-    , energy
-    , mass
-    , pt
-
     , finalStates
     , mothers
     , initialStates
     , daughters
     ) where
 
-import           HEP.Vector.LorentzVector
+import           HEP.Vector.LorentzVector (LorentzVector (..))
 
-import qualified Data.IntMap as IntMap
-import           Data.List (nub)
+import qualified Data.IntMap              as IntMap
+import           Data.List                (nub)
 
 data EventInfo = EventInfo
     { -- | Number of particle entries in the event.
@@ -43,22 +36,22 @@ data EventInfo = EventInfo
 
 data Particle = Particle
     { -- | Particle ID according to Particle Data Group convention.
-      idup     :: Int
+      idup   :: Int
       -- | Status code.
-    , istup    :: Int
+    , istup  :: Int
       -- | Index of first and last mother.
-    , mothup   :: (Int, Int)
+    , mothup :: (Int, Int)
       -- | Integer tag for the color flow line passing through the
       -- (anti-)color of the particle.
-    , icolup   :: (Int, Int)
+    , icolup :: (Int, Int)
       -- | Lab frame momentum (P_x, P_y, P_z, E, M) of particle in GeV.
-    , pup      :: (Double, Double, Double, Double, Double)
+    , pup    :: (Double, Double, Double, Double, Double)
       -- | Invariant lifetime (distance from production to decay) in mm.
-    , vtimup   :: Double
+    , vtimup :: Double
       -- | Consine of the angle between the spin-vector of particle and
       -- the three-momentum of the decaying particle, specified in the
       -- lab frame.
-    , spinup   :: Double
+    , spinup :: Double
     } deriving Show
 
 instance Eq Particle where
@@ -66,6 +59,7 @@ instance Eq Particle where
 
 instance Ord Particle where
     p >= p' = pt p >= pt p'
+        where pt Particle { pup = (x, y, _, _, _) } = sqrt $ x*x + y*y
 
 type ParIdx = Int
 
@@ -76,24 +70,6 @@ type Event = (EventInfo, ParticleMap)
 fourMomentum :: Particle -> LorentzVector Double
 fourMomentum Particle { pup = (x, y, z, e, _) } =
     LorentzVector e x y z
-
-px :: Particle -> Double
-px Particle { pup = (x, _, _, _, _) } = x
-
-py :: Particle -> Double
-py Particle { pup = (_, y, _, _, _) } = y
-
-pz :: Particle -> Double
-pz Particle { pup = (_, _, z, _, _) } = z
-
-energy :: Particle -> Double
-energy Particle { pup = (_, _, _, e, _) } = e
-
-mass :: Particle -> Double
-mass Particle { pup = (_, _, _, _, m) } = m
-
-pt :: Particle -> Double
-pt Particle { pup = (x, y, _, _, _) } = sqrt $ x*x + y*y
 
 finalStates :: ParticleMap -> [Particle]
 finalStates = IntMap.elems . IntMap.filter (\Particle { .. } -> istup == 1)

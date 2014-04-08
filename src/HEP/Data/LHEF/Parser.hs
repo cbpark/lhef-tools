@@ -2,13 +2,14 @@ module HEP.Data.LHEF.Parser
     ( parseEvent
     ) where
 
-import Data.Attoparsec.ByteString.Char8 (Parser, skipSpace, signed, string,
-                                         decimal, double, many1, endOfLine)
-import Data.ByteString.Char8 (pack)
-import Control.Applicative ((<*))
-import Data.IntMap (fromList)
+import           Control.Applicative              ((<*))
+import           Data.Attoparsec.ByteString.Char8 (Parser, decimal, double,
+                                                   endOfLine, many1, signed,
+                                                   skipSpace, string)
+import           Data.ByteString.Char8            (pack)
+import           Data.IntMap                      (fromList)
 
-import HEP.Data.LHEF
+import           HEP.Data.LHEF
 
 parseEventInfo :: Parser EventInfo
 parseEventInfo = do
