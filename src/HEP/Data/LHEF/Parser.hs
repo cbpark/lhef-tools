@@ -1,15 +1,18 @@
 module HEP.Data.LHEF.Parser
-    ( parseEvent
+    (
+      parseEvent
+    , stripLHEF
     ) where
+
+import           HEP.Data.LHEF
 
 import           Control.Applicative              ((<*))
 import           Data.Attoparsec.ByteString.Char8 (Parser, decimal, double,
                                                    endOfLine, many1, signed,
                                                    skipSpace, string)
 import           Data.ByteString.Char8            (pack)
+import qualified Data.ByteString.Lazy.Char8       as C
 import           Data.IntMap                      (fromList)
-
-import           HEP.Data.LHEF
 
 parseEventInfo :: Parser EventInfo
 parseEventInfo = do
@@ -85,3 +88,6 @@ parseEvent = do
 
   let parMap = fromList $ zip [1..] parEntries
   return (evInfo, parMap)
+
+stripLHEF :: C.ByteString -> C.ByteString
+stripLHEF = C.unlines . init . dropWhile (/= C.pack "<event>") . C.lines
