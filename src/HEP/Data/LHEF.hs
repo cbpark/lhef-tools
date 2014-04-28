@@ -9,7 +9,7 @@ module HEP.Data.LHEF
 
     , fourMomentum
     , finalStates
-    , mothers
+    , familyLine
     , initialStates
     , daughters
     ) where
@@ -78,13 +78,13 @@ mother :: ParticleMap -> Particle -> Maybe Particle
 mother pm Particle { mothup = (m, _) } | m `elem` [1, 2] = Nothing
                                        | otherwise       = IntMap.lookup m pm
 
-mothers :: ParticleMap -> Maybe Particle -> [Particle]
-mothers pm (Just p) = p : mothers pm (mother pm p)
-mothers _  Nothing  = []
+familyLine :: ParticleMap -> Maybe Particle -> [Particle]
+familyLine pm (Just p) = p : familyLine pm (mother pm p)
+familyLine _  Nothing  = []
 
 initialStates :: ParticleMap -> [Particle]
 initialStates pm = nub $ map (ancenstor pm) $ finalStates pm
-    where ancenstor pm' p' = last $ mothers pm' (Just p')
+    where ancenstor pm' p' = last $ familyLine pm' (Just p')
 
 daughters :: (ParIdx, Particle) -> ParticleMap -> [Particle]
 daughters (i, _) = IntMap.elems .
