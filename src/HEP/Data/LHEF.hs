@@ -11,8 +11,10 @@ module HEP.Data.LHEF
     , finalStates
     , familyLine
     , initialStates
-    , daughters
-    ) where
+    , getDaughters
+    , particleLineOf
+    )
+    where
 
 import           HEP.Vector.LorentzVector (LorentzVector (..))
 
@@ -83,5 +85,19 @@ initialStates :: ParticleMap -> [Particle]
 initialStates pm = nub $ map (ancenstor pm) (finalStates pm)
     where ancenstor pm' = last . familyLine pm' . Just
 
-daughters :: Int -> ParticleMap -> [Particle]
-daughters i = IntMap.elems . IntMap.filter (\Particle { .. } -> fst mothup == i)
+getDaughters :: ParticleMap -> Int -> [Particle]
+getDaughters pm i = map snd (getDaughters' pm i)
+
+getDaughters' :: ParticleMap -> Int -> [(Int, Particle)]
+getDaughters' pm i = stablePars (daughters i pm)
+    where daughters i' = IntMap.toList .
+                         IntMap.filter (\Particle { .. } -> fst mothup == i')
+
+          stablePars []      = []
+          stablePars ((n, p):ps)
+              | istup p == 1 = (n, p) : stablePars ps
+              | otherwise    = getDaughters' pm n ++ stablePars ps
+
+particleLineOf :: [Int] -> ParticleMap -> [Int]
+particleLineOf ns = IntMap.keys .
+                    IntMap.filter (\Particle { .. } -> abs idup `elem` ns)
