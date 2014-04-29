@@ -1,9 +1,9 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module HEP.Data.LHEF
-    ( EventInfo(..)
-    , Particle(..)
-    , ParIdx
+    (
+      EventInfo (..)
+    , Particle (..)
     , ParticleMap
     , Event
 
@@ -61,8 +61,6 @@ instance Ord Particle where
     p >= p' = pt p >= pt p'
         where pt Particle { pup = (x, y, _, _, _) } = sqrt $ x*x + y*y
 
-type ParIdx = Int
-
 type ParticleMap = IntMap.IntMap Particle
 
 type Event = (EventInfo, ParticleMap)
@@ -74,18 +72,16 @@ fourMomentum Particle { pup = (x, y, z, e, _) } =
 finalStates :: ParticleMap -> [Particle]
 finalStates = IntMap.elems . IntMap.filter (\Particle { .. } -> istup == 1)
 
-mother :: ParticleMap -> Particle -> Maybe Particle
-mother pm Particle { mothup = (m, _) } | m `elem` [1, 2] = Nothing
-                                       | otherwise       = IntMap.lookup m pm
-
 familyLine :: ParticleMap -> Maybe Particle -> [Particle]
-familyLine pm (Just p) = p : familyLine pm (mother pm p)
 familyLine _  Nothing  = []
+familyLine pm (Just p) = p : familyLine pm (mother pm p)
+    where mother pm' Particle { mothup = (m, _) }
+              | m `elem` [1, 2] = Nothing
+              | otherwise       = IntMap.lookup m pm'
 
 initialStates :: ParticleMap -> [Particle]
-initialStates pm = nub $ map (ancenstor pm) $ finalStates pm
-    where ancenstor pm' p' = last $ familyLine pm' (Just p')
+initialStates pm = nub $ map (ancenstor pm) (finalStates pm)
+    where ancenstor pm' = last . familyLine pm' . Just
 
-daughters :: (ParIdx, Particle) -> ParticleMap -> [Particle]
-daughters (i, _) = IntMap.elems .
-                   IntMap.filter (\Particle { .. } -> fst mothup == i)
+daughters :: Int -> ParticleMap -> [Particle]
+daughters i = IntMap.elems . IntMap.filter (\Particle { .. } -> fst mothup == i)
