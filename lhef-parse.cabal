@@ -1,4 +1,4 @@
-name:                lhef
+name:                lhef-parse
 version:             0.1.0.0
 synopsis:            Tools for the LHEF analyses
 description:         This package provides simple parsers and functions for manipulating files in the Les Houches Event Form (LHEF).
