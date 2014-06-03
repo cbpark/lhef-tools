@@ -7,8 +7,10 @@ module HEP.Data.LHEF.Parser
 import           HEP.Data.LHEF
 
 import           Control.Applicative              ((<*))
+import           Data.Attoparsec.ByteString       (skipWhile)
 import           Data.Attoparsec.ByteString.Char8 (Parser, decimal, double,
-                                                   endOfLine, many1, signed,
+                                                   endOfLine, isEndOfLine,
+                                                   many', many1', signed,
                                                    skipSpace, string)
 import           Data.ByteString.Char8            (pack)
 import qualified Data.ByteString.Lazy.Char8       as C
@@ -76,7 +78,12 @@ parseParticle = do
                   }
 
 parseParticleEntries :: Parser [Particle]
-parseParticleEntries = many1 $ parseParticle <* endOfLine
+parseParticleEntries = many1' $ parseParticle <* endOfLine
+
+parseOpEvInfo :: Parser [()]
+parseOpEvInfo =  many' $ do
+                   _ <- string $ pack "#"
+                   skipWhile (not . isEndOfLine) <* endOfLine
 
 parseEvent :: Parser Event
 parseEvent = do
@@ -84,6 +91,7 @@ parseEvent = do
   _ <- string $ pack "<event>"
   evInfo <- parseEventInfo
   parEntries <- parseParticleEntries
+  _ <- parseOpEvInfo
   _ <- string $ pack "</event>"
 
   let parMap = fromList $ zip [1..] parEntries
