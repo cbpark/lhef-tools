@@ -7,11 +7,12 @@ module HEP.Data.LHEF
     , ParticleMap
     , Event
 
+    , energyOf
     , fourMomentum
     , finalStates
     , familyLine
-    , initialStates
     , getDaughters
+    , initialStates
     , particleLineOf
     )
     where
@@ -70,6 +71,9 @@ type Event = (EventInfo, ParticleMap)
 fourMomentum :: Particle -> LorentzVector Double
 fourMomentum Particle { pup = (x, y, z, e, _) } =
     LorentzVector e x y z
+
+energyOf :: Particle -> Double
+energyOf Particle { pup = (_, _, _, e, _) } = e
 
 finalStates :: ParticleMap -> [Particle]
 finalStates = IntMap.elems . IntMap.filter (\Particle { .. } -> istup == 1)
