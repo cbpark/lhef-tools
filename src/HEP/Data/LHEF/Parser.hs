@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module HEP.Data.LHEF.Parser
     (
       parseEvent
@@ -12,7 +14,6 @@ import           Data.Attoparsec.ByteString.Char8 (Parser, decimal, double,
                                                    endOfLine, isEndOfLine,
                                                    many', many1', signed,
                                                    skipSpace, string)
-import           Data.ByteString.Char8            (pack)
 import qualified Data.ByteString.Lazy.Char8       as C
 import           Data.IntMap                      (fromList)
 
@@ -82,20 +83,20 @@ parseParticleEntries = many1' $ parseParticle <* endOfLine
 
 parseOpEvInfo :: Parser [()]
 parseOpEvInfo =  many' $ do
-                   _ <- string $ pack "#"
+                   _ <- string "#"
                    skipWhile (not . isEndOfLine) <* endOfLine
 
 parseEvent :: Parser Event
 parseEvent = do
   skipSpace
-  _ <- string $ pack "<event>"
+  _ <- string "<event>"
   evInfo <- parseEventInfo
   parEntries <- parseParticleEntries
   _ <- parseOpEvInfo
-  _ <- string $ pack "</event>"
+  _ <- string "</event>"
 
   let parMap = fromList $ zip [1..] parEntries
   return (evInfo, parMap)
 
 stripLHEF :: C.ByteString -> C.ByteString
-stripLHEF = C.unlines . init . dropWhile (/= C.pack "<event>") . C.lines
+stripLHEF = C.unlines . init . dropWhile (/="<event>") . C.lines
