@@ -12,7 +12,7 @@ import           Control.Applicative              ((<*))
 import           Data.Attoparsec.ByteString       (skipWhile)
 import           Data.Attoparsec.ByteString.Char8 (Parser, decimal, double,
                                                    endOfLine, isEndOfLine,
-                                                   many', many1', signed,
+                                                   many', many1', signed, char,
                                                    skipSpace, string)
 import qualified Data.ByteString.Lazy.Char8       as C
 import           Data.IntMap                      (fromList)
@@ -83,7 +83,7 @@ parseParticleEntries = many1' $ parseParticle <* endOfLine
 
 parseOpEvInfo :: Parser [()]
 parseOpEvInfo =  many' $ do
-                   _ <- string "#"
+                   _ <- char '#'
                    skipWhile (not . isEndOfLine) <* endOfLine
 
 parseEvent :: Parser Event

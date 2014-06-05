@@ -16,6 +16,7 @@ module HEP.Data.LHEF
     , initialStates
     , inParticles
     , particleLineOf
+    , particlesFrom
     )
     where
 
@@ -82,6 +83,10 @@ idOf Particle { .. } = idup
 
 inParticles :: [Int] -> Particle -> Bool
 inParticles ns = (`elem` ns) . abs . idup
+
+particlesFrom :: [Int] -> ParticleMap -> [[Particle]]
+particlesFrom ns pm = let pl = particleLineOf ns pm
+                      in map (getDaughters pm) pl
 
 finalStates :: ParticleMap -> [Particle]
 finalStates = IntMap.elems . IntMap.filter (\Particle { .. } -> istup == 1)
