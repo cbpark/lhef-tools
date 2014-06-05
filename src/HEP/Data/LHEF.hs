@@ -12,7 +12,9 @@ module HEP.Data.LHEF
     , finalStates
     , familyLine
     , getDaughters
+    , idOf
     , initialStates
+    , inParticles
     , particleLineOf
     )
     where
@@ -74,6 +76,12 @@ fourMomentum Particle { pup = (x, y, z, e, _) } =
 
 energyOf :: Particle -> Double
 energyOf Particle { pup = (_, _, _, e, _) } = e
+
+idOf :: Particle -> Int
+idOf Particle { .. } = idup
+
+inParticles :: [Int] -> Particle -> Bool
+inParticles ns = (`elem` ns) . abs . idup
 
 finalStates :: ParticleMap -> [Particle]
 finalStates = IntMap.elems . IntMap.filter (\Particle { .. } -> istup == 1)
