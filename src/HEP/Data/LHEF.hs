@@ -6,6 +6,7 @@ module HEP.Data.LHEF
     , EventInfo (..)
     , Particle (..)
     , ParticleMap
+    , ParType
 
     , energyOf
     , fourMomentum
@@ -14,7 +15,7 @@ module HEP.Data.LHEF
     , getDaughters
     , idOf
     , initialStates
-    , inParticles
+    , is
     , particleLineOf
     , particlesFrom
     , threeMomentum
@@ -73,6 +74,8 @@ type ParticleMap = IntMap.IntMap Particle
 
 type Event = (EventInfo, ParticleMap)
 
+type ParType = [Int]
+
 fourMomentum :: Particle -> LorentzVector Double
 fourMomentum Particle { pup = (x, y, z, e, _) } = LorentzVector e x y z
 
@@ -85,10 +88,10 @@ energyOf Particle { pup = (_, _, _, e, _) } = e
 idOf :: Particle -> Int
 idOf Particle { .. } = idup
 
-inParticles :: [Int] -> Particle -> Bool
-inParticles ns = (`elem` ns) . abs . idup
+is :: Particle -> ParType -> Bool
+p `is` ns = (`elem` ns) . abs . idup $ p
 
-particlesFrom :: [Int] -> ParticleMap -> [[Particle]]
+particlesFrom :: ParType -> ParticleMap -> [[Particle]]
 particlesFrom ns pm = let pl = particleLineOf ns pm
                       in map (getDaughters pm) pl
 

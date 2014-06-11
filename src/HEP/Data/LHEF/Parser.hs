@@ -10,10 +10,10 @@ import           HEP.Data.LHEF
 
 import           Control.Applicative              ((<*))
 import           Data.Attoparsec.ByteString       (skipWhile)
-import           Data.Attoparsec.ByteString.Char8 (Parser, decimal, double,
-                                                   endOfLine, isEndOfLine,
-                                                   many', many1', signed, char,
-                                                   skipSpace, string)
+import           Data.Attoparsec.ByteString.Char8 (Parser, char, decimal,
+                                                   double, endOfLine,
+                                                   isEndOfLine, many', many1',
+                                                   signed, skipSpace, string)
 import qualified Data.ByteString.Lazy.Char8       as C
 import           Data.IntMap                      (fromList)
 
