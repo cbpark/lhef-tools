@@ -2,10 +2,10 @@
 
 module HEP.Data.LHEF
     (
-      EventInfo (..)
+      Event
+    , EventInfo (..)
     , Particle (..)
     , ParticleMap
-    , Event
 
     , energyOf
     , fourMomentum
@@ -17,10 +17,12 @@ module HEP.Data.LHEF
     , inParticles
     , particleLineOf
     , particlesFrom
+    , threeMomentum
     )
     where
 
 import           HEP.Vector.LorentzVector (LorentzVector (..))
+import           HEP.Vector.ThreeVector   (ThreeVector (..))
 
 import qualified Data.IntMap              as IntMap
 import           Data.List                (nub)
@@ -72,8 +74,10 @@ type ParticleMap = IntMap.IntMap Particle
 type Event = (EventInfo, ParticleMap)
 
 fourMomentum :: Particle -> LorentzVector Double
-fourMomentum Particle { pup = (x, y, z, e, _) } =
-    LorentzVector e x y z
+fourMomentum Particle { pup = (x, y, z, e, _) } = LorentzVector e x y z
+
+threeMomentum :: Particle -> ThreeVector Double
+threeMomentum Particle { pup = (x, y, z, _, _) } = ThreeVector x y z
 
 energyOf :: Particle -> Double
 energyOf Particle { pup = (_, _, _, e, _) } = e
