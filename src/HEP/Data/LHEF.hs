@@ -127,10 +127,9 @@ finalStates = IntMap.elems . IntMap.filter (\Particle { .. } -> istup == 1)
 
 particlesFrom :: ParticleType -> Reader ParticleMap [[Particle]]
 particlesFrom pid = do
+  pl <- asks $ IntMap.keys . IntMap.filter (`is` pid)
   pm <- ask
-  pl <- particleTrackOf pid
   return $ map (`getDaughters` pm) pl
-    where particleTrackOf pid' = asks $ IntMap.keys . IntMap.filter (`is` pid')
 
 getDaughters :: Int -> ParticleMap -> [Particle]
 getDaughters i pm = stablePars (daughters i pm)
