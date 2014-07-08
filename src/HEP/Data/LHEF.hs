@@ -73,10 +73,6 @@ data Particle = Particle
 instance Eq Particle where
     p == p' = (idup p == idup p') && (pup p == pup p')
 
-instance Ord Particle where
-    p >= p' = pt p >= pt p'
-        where pt Particle { pup = (x, y, _, _, _) } = sqrt $ x*x + y*y
-
 type ParticleMap = IntMap.IntMap Particle
 
 type Event = (EventInfo, ParticleMap)
@@ -132,15 +128,14 @@ finalStates = IntMap.elems . IntMap.filter (\Particle { .. } -> istup == 1)
 particlesFrom :: ParticleType -> Reader ParticleMap [[Particle]]
 particlesFrom pid = do
   pm <- ask
-  pl <- particleLineOf (getParType pid)
+  pl <- particleTrackOf pid
   return $ map (`getDaughters` pm) pl
-    where particleLineOf ns =
-              asks $ IntMap.keys . IntMap.filter (\p -> p `is` ParticleType ns)
+    where particleTrackOf pid' = asks $ IntMap.keys . IntMap.filter (`is` pid')
 
 getDaughters :: Int -> ParticleMap -> [Particle]
 getDaughters i pm = stablePars (daughters i pm)
     where daughters i' = IntMap.filter (\Particle { .. } -> fst mothup == i')
           stablePars = IntMap.foldrWithKey
-                       (\k p ps -> case istup p of
-                                     1 -> p : ps
-                                     _ -> getDaughters k pm ++ ps) []
+                       (\k p acc -> case istup p of
+                                     1 -> p : acc
+                                     _ -> getDaughters k pm ++ acc) []
