@@ -8,6 +8,8 @@ module HEP.Data.LHEF
     , ParticleMap
     , ParType
 
+    , cosTheta
+    , dR
     , energyOf
     , fourMomentum
     , finalStates
@@ -15,16 +17,22 @@ module HEP.Data.LHEF
     , getDaughters
     , idOf
     , initialStates
+    , invMass
     , is
     , particleLineOf
     , particlesFrom
+    , rapidity
     , threeMomentum
+    , transMomentum
     )
     where
 
-import           HEP.Vector.LorentzVector (LorentzVector (..))
+import           HEP.Vector
+import           HEP.Vector.LorentzVector (LorentzVector (..), deltaR,
+                                           deltaTheta, eta, invariantMass, pT)
 import           HEP.Vector.ThreeVector   (ThreeVector (..))
 
+import           Data.Function            (on)
 import qualified Data.IntMap              as IntMap
 import           Data.List                (nub)
 
@@ -81,6 +89,23 @@ fourMomentum Particle { pup = (x, y, z, e, _) } = LorentzVector e x y z
 
 threeMomentum :: Particle -> ThreeVector Double
 threeMomentum Particle { pup = (x, y, z, _, _) } = ThreeVector x y z
+
+invMass :: [Particle] -> Double
+invMass = invariantMass . foldr ((.+.) . fourMomentum) zero
+
+transMomentum :: [Particle] -> Double
+transMomentum = pT . foldr ((.+.) . fourMomentum) zero
+
+rapidity :: Particle -> Double
+rapidity = eta . fourMomentum
+
+cosTheta :: [Particle] -> Maybe Double
+cosTheta [p,p'] = Just $ cos $ (deltaTheta `on` fourMomentum) p p'
+cosTheta _      = Nothing
+
+dR :: [Particle] -> Maybe Double
+dR [p,p'] = Just $ (deltaR `on` fourMomentum) p p'
+dR _      = Nothing
 
 energyOf :: Particle -> Double
 energyOf Particle { pup = (_, _, _, e, _) } = e
