@@ -5,21 +5,19 @@ module HEP.Data.LHEF
       Event
     , EventInfo (..)
     , Particle (..)
+    , ParticleType (..)
     , ParticleMap
-    , ParType
 
     , cosTheta
     , dR
     , energyOf
     , fourMomentum
     , finalStates
-    , familyLine
     , getDaughters
     , idOf
     , initialStates
     , invMass
     , is
-    , particleLineOf
     , particlesFrom
     , rapidity
     , threeMomentum
@@ -28,13 +26,14 @@ module HEP.Data.LHEF
     where
 
 import           HEP.Vector
-import           HEP.Vector.LorentzVector (LorentzVector (..), deltaR,
-                                           deltaTheta, eta, invariantMass, pT)
-import           HEP.Vector.ThreeVector   (ThreeVector (..))
+import           HEP.Vector.LorentzVector   (LorentzVector (..), deltaR,
+                                             deltaTheta, eta, invariantMass, pT)
+import           HEP.Vector.ThreeVector     (ThreeVector (..))
 
-import           Data.Function            (on)
-import qualified Data.IntMap              as IntMap
-import           Data.List                (nub)
+import           Control.Monad.Trans.Reader
+import           Data.Function              (on)
+import qualified Data.IntMap                as IntMap
+import           Data.List                  (nub)
 
 data EventInfo = EventInfo
     { -- | Number of particle entries in the event.
@@ -82,7 +81,7 @@ type ParticleMap = IntMap.IntMap Particle
 
 type Event = (EventInfo, ParticleMap)
 
-type ParType = [Int]
+newtype ParticleType = ParticleType { getParType :: [Int] }
 
 fourMomentum :: Particle -> LorentzVector Double
 fourMomentum Particle { pup = (x, y, z, e, _) } = LorentzVector e x y z
@@ -113,40 +112,35 @@ energyOf Particle { pup = (_, _, _, e, _) } = e
 idOf :: Particle -> Int
 idOf Particle { .. } = idup
 
-is :: Particle -> ParType -> Bool
-p `is` ns = (`elem` ns) . abs . idup $ p
-
-particlesFrom :: ParType -> ParticleMap -> [[Particle]]
-particlesFrom ns pm = let pl = particleLineOf ns pm
-                      in map (getDaughters pm) pl
-
-finalStates :: ParticleMap -> [Particle]
-finalStates = IntMap.elems . IntMap.filter (\Particle { .. } -> istup == 1)
-
-familyLine :: ParticleMap -> Maybe Particle -> [Particle]
-familyLine _  Nothing  = []
-familyLine pm (Just p) = p : familyLine pm (mother pm p)
-    where mother pm' Particle { mothup = (m, _) }
-              | m `elem` [1, 2] = Nothing
-              | otherwise       = IntMap.lookup m pm'
+is :: Particle -> ParticleType -> Bool
+p `is` pid = (`elem` getParType pid) . abs . idup $ p
 
 initialStates :: ParticleMap -> [Particle]
 initialStates pm = nub $ map (ancenstor pm) (finalStates pm)
     where ancenstor pm' = last . familyLine pm' . Just
 
-getDaughters :: ParticleMap -> Int -> [Particle]
-getDaughters pm i = map snd (getDaughters' pm i)
+familyLine :: ParticleMap -> Maybe Particle -> [Particle]
+familyLine _  Nothing  = []
+familyLine pm (Just p) = p : familyLine pm (mother pm p)
+    where mother pm' Particle { mothup = (m, _) }
+              | m `elem` [1,2] = Nothing
+              | otherwise      = IntMap.lookup m pm'
 
-getDaughters' :: ParticleMap -> Int -> [(Int, Particle)]
-getDaughters' pm i = stablePars (daughters i pm)
-    where daughters i' = IntMap.toList .
-                         IntMap.filter (\Particle { .. } -> fst mothup == i')
+finalStates :: ParticleMap -> [Particle]
+finalStates = IntMap.elems . IntMap.filter (\Particle { .. } -> istup == 1)
 
-          stablePars []      = []
-          stablePars ((n, p):ps)
-              | istup p == 1 = (n, p) : stablePars ps
-              | otherwise    = getDaughters' pm n ++ stablePars ps
+particlesFrom :: ParticleType -> Reader ParticleMap [[Particle]]
+particlesFrom pid = do
+  pm <- ask
+  pl <- particleLineOf (getParType pid)
+  return $ map (`getDaughters` pm) pl
+    where particleLineOf ns =
+              asks $ IntMap.keys . IntMap.filter (\p -> p `is` ParticleType ns)
 
-particleLineOf :: [Int] -> ParticleMap -> [Int]
-particleLineOf ns = IntMap.keys .
-                    IntMap.filter (\Particle { .. } -> abs idup `elem` ns)
+getDaughters :: Int -> ParticleMap -> [Particle]
+getDaughters i pm = stablePars (daughters i pm)
+    where daughters i' = IntMap.filter (\Particle { .. } -> fst mothup == i')
+          stablePars = IntMap.foldrWithKey
+                       (\k p ps -> case istup p of
+                                     1 -> p : ps
+                                     _ -> getDaughters k pm ++ ps) []
