@@ -30,6 +30,7 @@ import           HEP.Vector.LorentzVector   (LorentzVector (..), deltaR,
                                              deltaTheta, eta, invariantMass, pT)
 import           HEP.Vector.ThreeVector     (ThreeVector (..))
 
+import Control.Monad
 import           Control.Monad.Trans.Reader
 import           Data.Function              (on)
 import qualified Data.IntMap                as IntMap
@@ -112,7 +113,7 @@ is :: Particle -> ParticleType -> Bool
 p `is` pid = (`elem` getParType pid) . abs . idup $ p
 
 initialStates :: ParticleMap -> [Particle]
-initialStates pm = nub $ map (ancenstor pm) (finalStates pm)
+initialStates pm = nub $ map (ancenstor pm) (runReader finalStates pm)
     where ancenstor pm' = last . familyLine pm' . Just
 
 familyLine :: ParticleMap -> Maybe Particle -> [Particle]
@@ -122,8 +123,9 @@ familyLine pm (Just p) = p : familyLine pm (mother pm p)
               | m `elem` [1,2] = Nothing
               | otherwise      = IntMap.lookup m pm'
 
-finalStates :: ParticleMap -> [Particle]
-finalStates = IntMap.elems . IntMap.filter (\Particle { .. } -> istup == 1)
+finalStates :: Reader ParticleMap [Particle]
+finalStates = liftM IntMap.elems $ asks (IntMap.filter (\Particle { .. } ->
+                                                            istup == 1))
 
 particlesFrom :: ParticleType -> Reader ParticleMap [[Particle]]
 particlesFrom pid =
