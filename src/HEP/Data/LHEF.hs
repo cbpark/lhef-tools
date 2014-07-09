@@ -22,15 +22,16 @@ module HEP.Data.LHEF
     , rapidity
     , threeMomentum
     , transMomentum
+    , twoMomentum
     )
     where
 
 import           HEP.Vector
-import           HEP.Vector.LorentzVector   (LorentzVector (..), deltaR,
-                                             deltaTheta, eta, invariantMass, pT)
+import           HEP.Vector.LorentzVector
 import           HEP.Vector.ThreeVector     (ThreeVector (..))
+import           HEP.Vector.TwoVector       (TwoVector (..))
 
-import Control.Monad
+import           Control.Monad
 import           Control.Monad.Trans.Reader
 import           Data.Function              (on)
 import qualified Data.IntMap                as IntMap
@@ -85,6 +86,9 @@ fourMomentum Particle { pup = (x, y, z, e, _) } = LorentzVector e x y z
 
 threeMomentum :: Particle -> ThreeVector Double
 threeMomentum Particle { pup = (x, y, z, _, _) } = ThreeVector x y z
+
+twoMomentum :: Particle -> TwoVector Double
+twoMomentum Particle { pup = (x, y, _, _, _) } = TwoVector x y
 
 invMass :: [Particle] -> Double
 invMass = invariantMass . foldr ((.+.) . fourMomentum) zero
