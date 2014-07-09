@@ -8,8 +8,14 @@ module HEP.Data.LHEF
     , ParticleType (..)
     , ParticleMap
 
+    -- * Particle momentum
+    , FourMomentum
+    , ThreeMomentum
+    , TwoMomentum
+
     , cosTheta
     , dR
+    , deltaR
     , energyOf
     , fourMomentum
     , finalStates
@@ -81,13 +87,17 @@ type Event = (EventInfo, ParticleMap)
 
 newtype ParticleType = ParticleType { getParType :: [Int] }
 
-fourMomentum :: Particle -> LorentzVector Double
+type FourMomentum = LorentzVector Double
+type ThreeMomentum = ThreeVector Double
+type TwoMomentum = TwoVector Double
+
+fourMomentum :: Particle -> FourMomentum
 fourMomentum Particle { pup = (x, y, z, e, _) } = LorentzVector e x y z
 
-threeMomentum :: Particle -> ThreeVector Double
+threeMomentum :: Particle -> ThreeMomentum
 threeMomentum Particle { pup = (x, y, z, _, _) } = ThreeVector x y z
 
-twoMomentum :: Particle -> TwoVector Double
+twoMomentum :: Particle -> TwoMomentum
 twoMomentum Particle { pup = (x, y, _, _, _) } = TwoVector x y
 
 invMass :: [Particle] -> Double
