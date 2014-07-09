@@ -126,15 +126,15 @@ finalStates :: ParticleMap -> [Particle]
 finalStates = IntMap.elems . IntMap.filter (\Particle { .. } -> istup == 1)
 
 particlesFrom :: ParticleType -> Reader ParticleMap [[Particle]]
-particlesFrom pid = do
-  pl <- asks $ IntMap.keys . IntMap.filter (`is` pid)
-  pm <- ask
-  return $ map (`getDaughters` pm) pl
+particlesFrom pid =
+    asks (IntMap.keys . IntMap.filter (`is` pid)) >>= mapM getDaughters
 
-getDaughters :: Int -> ParticleMap -> [Particle]
-getDaughters i pm = stablePars (daughters i pm)
-    where daughters i' = IntMap.filter (\Particle { .. } -> fst mothup == i')
-          stablePars = IntMap.foldrWithKey
-                       (\k p acc -> case istup p of
-                                     1 -> p : acc
-                                     _ -> getDaughters k pm ++ acc) []
+getDaughters :: Int -> Reader ParticleMap [Particle]
+getDaughters i = do
+  pm <- ask
+  daughters <- asks $ IntMap.filter (\Particle { .. } -> fst mothup == i)
+  return $ IntMap.foldrWithKey
+             (\k p acc -> case istup p of
+                            1 -> p : acc
+                            _ -> runReader (getDaughters k) pm ++ acc) []
+             daughters
