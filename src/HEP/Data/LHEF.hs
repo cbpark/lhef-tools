@@ -8,14 +8,8 @@ module HEP.Data.LHEF
     , ParticleType (..)
     , ParticleMap
 
-    -- * Particle momentum
-    , FourMomentum
-    , ThreeMomentum
-    , TwoMomentum
-
     , cosTheta
     , dR
-    , deltaR
     , energyOf
     , fourMomentum
     , finalStates
@@ -26,16 +20,15 @@ module HEP.Data.LHEF
     , is
     , particlesFrom
     , rapidity
-    , threeMomentum
+    , transMass
+    , transMassOne
     , transMomentum
-    , twoMomentum
+    , transMomentumOne
     )
     where
 
 import           HEP.Vector
 import           HEP.Vector.LorentzVector
-import           HEP.Vector.ThreeVector     (ThreeVector (..))
-import           HEP.Vector.TwoVector       (TwoVector (..))
 
 import           Control.Monad
 import           Control.Monad.Trans.Reader
@@ -87,24 +80,26 @@ type Event = (EventInfo, ParticleMap)
 
 newtype ParticleType = ParticleType { getParType :: [Int] }
 
-type FourMomentum = LorentzVector Double
-type ThreeMomentum = ThreeVector Double
-type TwoMomentum = TwoVector Double
-
-fourMomentum :: Particle -> FourMomentum
+fourMomentum :: Particle -> LorentzVector Double
 fourMomentum Particle { pup = (x, y, z, e, _) } = LorentzVector e x y z
 
-threeMomentum :: Particle -> ThreeMomentum
-threeMomentum Particle { pup = (x, y, z, _, _) } = ThreeVector x y z
-
-twoMomentum :: Particle -> TwoMomentum
-twoMomentum Particle { pup = (x, y, _, _, _) } = TwoVector x y
-
 invMass :: [Particle] -> Double
-invMass = invariantMass . foldr ((.+.) . fourMomentum) zero
+invMass = invariantMass . momentumSum
+
+transMass :: [Particle] -> Particle -> Double
+transMass ps k = transverseMass (momentumSum ps) (fourMomentum k)
+
+transMassOne :: Particle -> Particle -> Double
+transMassOne = transverseMass `on` fourMomentum
+
+momentumSum :: [Particle] -> LorentzVector Double
+momentumSum = foldr ((.+.) . fourMomentum) zero
 
 transMomentum :: [Particle] -> Double
 transMomentum = pT . foldr ((.+.) . fourMomentum) zero
+
+transMomentumOne :: Particle -> Double
+transMomentumOne = pT . fourMomentum
 
 rapidity :: Particle -> Double
 rapidity = eta . fourMomentum
