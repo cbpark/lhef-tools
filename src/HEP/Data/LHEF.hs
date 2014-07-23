@@ -75,9 +75,7 @@ instance Eq Particle where
     p == p' = (idup p == idup p') && (pup p == pup p')
 
 type ParticleMap = IntMap.IntMap Particle
-
 type Event = (EventInfo, ParticleMap)
-
 newtype ParticleType = ParticleType { getParType :: [Int] }
 
 fourMomentum :: Particle -> LorentzVector Double
@@ -93,10 +91,10 @@ transMassOne :: Particle -> Particle -> Double
 transMassOne = transverseMass `on` fourMomentum
 
 momentumSum :: [Particle] -> LorentzVector Double
-momentumSum = foldr ((.+.) . fourMomentum) zero
+momentumSum = vectorSum . map fourMomentum
 
 transMomentum :: [Particle] -> Double
-transMomentum = pT . foldr ((.+.) . fourMomentum) zero
+transMomentum = pT . momentumSum
 
 transMomentumOne :: Particle -> Double
 transMomentumOne = pT . fourMomentum
