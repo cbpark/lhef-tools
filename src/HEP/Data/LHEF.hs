@@ -27,14 +27,15 @@ module HEP.Data.LHEF
     )
     where
 
-import           HEP.Vector
-import           HEP.Vector.LorentzVector
-
 import           Control.Monad
 import           Control.Monad.Trans.Reader
 import           Data.Function              (on)
-import qualified Data.IntMap                as IntMap
+import           Data.IntMap                (IntMap)
+import qualified Data.IntMap                as M
 import           Data.List                  (nub)
+
+import           HEP.Vector
+import           HEP.Vector.LorentzVector
 
 data EventInfo = EventInfo
     { -- | Number of particle entries in the event.
@@ -69,17 +70,17 @@ data Particle = Particle
       -- the three-momentum of the decaying particle, specified in the
       -- lab frame.
     , spinup :: Double
-    } deriving Show
+    } deriving (Eq, Show)
 
-instance Eq Particle where
-    p == p' = (idup p == idup p') && (pup p == pup p')
-
-type ParticleMap = IntMap.IntMap Particle
+type ParticleMap = IntMap Particle
 type Event = (EventInfo, ParticleMap)
 newtype ParticleType = ParticleType { getParType :: [Int] }
 
 fourMomentum :: Particle -> LorentzVector Double
 fourMomentum Particle { pup = (x, y, z, e, _) } = LorentzVector e x y z
+
+momentumSum :: [Particle] -> LorentzVector Double
+momentumSum = vectorSum . map fourMomentum
 
 invMass :: [Particle] -> Double
 invMass = invariantMass . momentumSum
@@ -89,9 +90,6 @@ transMass ps k = transverseMass (momentumSum ps) (fourMomentum k)
 
 transMassOne :: Particle -> Particle -> Double
 transMassOne = transverseMass `on` fourMomentum
-
-momentumSum :: [Particle] -> LorentzVector Double
-momentumSum = vectorSum . map fourMomentum
 
 transMomentum :: [Particle] -> Double
 transMomentum = pT . momentumSum
@@ -103,7 +101,7 @@ rapidity :: Particle -> Double
 rapidity = eta . fourMomentum
 
 cosTheta :: [Particle] -> Maybe Double
-cosTheta [p,p'] = Just $ cos $ (deltaTheta `on` fourMomentum) p p'
+cosTheta [p,p'] = Just . cos $ (deltaTheta `on` fourMomentum) p p'
 cosTheta _      = Nothing
 
 dR :: [Particle] -> Maybe Double
@@ -128,21 +126,19 @@ familyLine _  Nothing  = []
 familyLine pm (Just p) = p : familyLine pm (mother pm p)
     where mother pm' Particle { mothup = (m, _) }
               | m `elem` [1,2] = Nothing
-              | otherwise      = IntMap.lookup m pm'
+              | otherwise      = M.lookup m pm'
 
 finalStates :: Reader ParticleMap [Particle]
-finalStates = liftM IntMap.elems $ asks (IntMap.filter (\Particle { .. } ->
-                                                            istup == 1))
+finalStates = liftM M.elems $ asks (M.filter (\Particle { .. } -> istup == 1))
 
 particlesFrom :: ParticleType -> Reader ParticleMap [[Particle]]
-particlesFrom pid =
-    asks (IntMap.keys . IntMap.filter (`is` pid)) >>= mapM getDaughters
+particlesFrom pid = asks (M.keys . M.filter (`is` pid)) >>= mapM getDaughters
 
 getDaughters :: Int -> Reader ParticleMap [Particle]
 getDaughters i = do
   pm <- ask
-  daughters <- asks $ IntMap.filter (\Particle { .. } -> fst mothup == i)
-  return $ IntMap.foldrWithKey
+  daughters <- asks $ M.filter (\Particle { .. } -> fst mothup == i)
+  return $ M.foldrWithKey
              (\k p acc -> case istup p of
                             1 -> p : acc
                             _ -> runReader (getDaughters k) pm ++ acc) []
