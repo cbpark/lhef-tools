@@ -1,0 +1,24 @@
+module Main where
+
+import           Control.Monad              (liftM, when)
+import qualified Data.ByteString.Lazy.Char8 as C
+import           Data.Conduit
+import           Data.Conduit.Attoparsec    (conduitParser)
+import qualified Data.Conduit.Binary        as CB
+import qualified Data.Conduit.List          as CL
+import           System.Environment         (getArgs)
+import           System.Exit                (exitFailure)
+
+import           HEP.Data.LHEF.Parser       (lhefEvent, stripLHEF)
+
+main :: IO ()
+main = do
+  args <- getArgs
+  when (length args /= 1) $ do
+         putStrLn "Usage: testlhefparse filename"
+         exitFailure
+
+  let infile = head args
+  putStrLn $ "-- Parsing " ++ show infile ++ "."
+  evstr <- liftM stripLHEF (C.readFile infile)
+  CB.sourceLbs evstr $$ conduitParser lhefEvent =$ CL.mapM_ (print . snd)
