@@ -8,6 +8,7 @@ import qualified Data.Conduit.Binary        as CB
 import qualified Data.Conduit.List          as CL
 import           System.Environment         (getArgs)
 import           System.Exit                (exitFailure)
+import           System.IO
 
 import           HEP.Data.LHEF.Parser       (lhefEvent, stripLHEF)
 
@@ -20,5 +21,6 @@ main = do
 
   let infile = head args
   putStrLn $ "-- Parsing " ++ show infile ++ "."
-  evstr <- liftM stripLHEF (C.readFile infile)
-  CB.sourceLbs evstr $$ conduitParser lhefEvent =$ CL.mapM_ (print . snd)
+  withFile infile ReadMode $ \inh -> do
+    evstr <- liftM stripLHEF (C.hGetContents inh)
+    CB.sourceLbs evstr $$ conduitParser lhefEvent =$ CL.mapM_ (print . snd)

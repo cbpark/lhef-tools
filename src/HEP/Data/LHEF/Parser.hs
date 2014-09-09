@@ -75,7 +75,7 @@ particleEntries :: Parser [Particle]
 particleEntries = many1' $ particle <* endOfLine
 
 opEvInfo :: Parser [()]
-opEvInfo =  many' $ char '#' >> skipWhile (not . isEndOfLine) <* endOfLine
+opEvInfo =  many' $ char '#' >> skipWhile (not . isEndOfLine) >> endOfLine
 
 lhefEvent :: Parser Event
 lhefEvent = do skipSpace

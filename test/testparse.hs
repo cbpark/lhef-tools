@@ -6,6 +6,7 @@ import           Data.ByteString.Lazy.Char8      (ByteString)
 import qualified Data.ByteString.Lazy.Char8      as C
 import           System.Environment              (getArgs)
 import           System.Exit                     (exitFailure)
+import           System.IO
 
 import           HEP.Data.LHEF.Parser            (lhefEvent, stripLHEF)
 
@@ -25,6 +26,6 @@ main = do
 
   let infile = head args
   putStrLn $ "-- Parsing " ++ show infile ++ "."
-  evstr <- liftM stripLHEF (C.readFile infile)
-  -- print $ (parseOnly lhefEvents . stripLHEF) evstr
-  parseAndPrint evstr
+  withFile infile ReadMode $ \inh -> do
+    evstr <- liftM stripLHEF (C.hGetContents inh)
+    parseAndPrint evstr
