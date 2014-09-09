@@ -1,6 +1,6 @@
 module Main where
 
-import           Control.Monad                   (liftM, when)
+import           Control.Monad                   (when)
 import           Data.Attoparsec.ByteString.Lazy
 import           Data.ByteString.Lazy.Char8      (ByteString)
 import qualified Data.ByteString.Lazy.Char8      as C
@@ -8,7 +8,7 @@ import           System.Environment              (getArgs)
 import           System.Exit                     (exitFailure)
 import           System.IO
 
-import           HEP.Data.LHEF.Parser            (lhefEvent, stripLHEF)
+import           HEP.Data.LHEF.Parser
 
 parseAndPrint :: ByteString -> IO ()
 parseAndPrint str =
@@ -27,5 +27,5 @@ main = do
   let infile = head args
   putStrLn $ "-- Parsing " ++ show infile ++ "."
   withFile infile ReadMode $ \inh -> do
-    evstr <- liftM stripLHEF (C.hGetContents inh)
+    evstr <- C.hGetContents inh
     parseAndPrint evstr

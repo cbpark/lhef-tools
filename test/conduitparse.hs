@@ -1,6 +1,6 @@
 module Main where
 
-import           Control.Monad              (liftM, when)
+import           Control.Monad              (when)
 import qualified Data.ByteString.Lazy.Char8 as C
 import           Data.Conduit
 import           Data.Conduit.Attoparsec    (conduitParser)
@@ -10,7 +10,7 @@ import           System.Environment         (getArgs)
 import           System.Exit                (exitFailure)
 import           System.IO
 
-import           HEP.Data.LHEF.Parser       (lhefEvent, stripLHEF)
+import           HEP.Data.LHEF.Parser
 
 main :: IO ()
 main = do
@@ -22,5 +22,5 @@ main = do
   let infile = head args
   putStrLn $ "-- Parsing " ++ show infile ++ "."
   withFile infile ReadMode $ \inh -> do
-    evstr <- liftM stripLHEF (C.hGetContents inh)
+    evstr <- C.hGetContents inh
     CB.sourceLbs evstr $$ conduitParser lhefEvent =$ CL.mapM_ (print . snd)

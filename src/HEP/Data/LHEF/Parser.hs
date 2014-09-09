@@ -71,24 +71,21 @@ particle = do skipSpace
                               , vtimup = vtimup'
                               , spinup = spinup' }
 
-particleEntries :: Parser [Particle]
-particleEntries = many1' $ particle <* endOfLine
-
-opEvInfo :: Parser [()]
-opEvInfo =  many' $ char '#' >> skipWhile (not . isEndOfLine) >> endOfLine
-
 lhefEvent :: Parser Event
 lhefEvent = do skipSpace
-               string "<event>"
+               manyTill' skipTillEnd (string "<event>" >> endOfLine)
                evInfo <- eventInfo <* endOfLine
-               parEntries <- particleEntries
+               parEntries <- many1' $ particle <* endOfLine
                opEvInfo
-               string "</event>"
-               endOfLine
+               string "</event>" >> endOfLine
+               finalLine
                return (evInfo, fromList $ zip [1..] parEntries)
+  where opEvInfo = many' $ char '#' >> skipTillEnd
+        finalLine = many' $ string "</LesHouchesEvents>" >> endOfLine
+        skipTillEnd = skipWhile (not . isEndOfLine) >> endOfLine
 
 lhefEvents :: Parser [Event]
-lhefEvents = many1' lhefEvent
+lhefEvents = string "<LesHouchesEvents version=" >> many1' lhefEvent
 
 stripLHEF :: ByteString -> ByteString
 stripLHEF = C.unlines . init . dropWhile (/="<event>") . C.lines
