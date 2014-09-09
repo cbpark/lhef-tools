@@ -10,13 +10,13 @@ import qualified Data.Conduit.List            as CL
 import           System.Environment           (getArgs)
 import           System.Exit                  (exitFailure)
 
-import           HEP.Data.LHEF.Parser         (lhefEvent)
+import           HEP.Data.LHEF
 
 main :: IO ()
 main = do
   args <- getArgs
   when (length args /= 1) $ do
-         putStrLn "Usage: testlhefparse filename"
+         putStrLn "Usage: lhef_conduitparse_test filename"
          exitFailure
 
   let infile = head args

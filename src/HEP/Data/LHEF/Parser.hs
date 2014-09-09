@@ -14,7 +14,7 @@ import           Data.ByteString.Lazy.Char8       (ByteString)
 import qualified Data.ByteString.Lazy.Char8       as C
 import           Data.IntMap                      (fromList)
 
-import           HEP.Data.LHEF
+import           HEP.Data.LHEF.Type
 
 eventInfo :: Parser EventInfo
 eventInfo = do skipSpace

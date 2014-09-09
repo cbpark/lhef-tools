@@ -15,6 +15,7 @@ cabal-version:       >=1.10
 library
   exposed-modules:     HEP.Data.LHEF
                        HEP.Data.LHEF.Parser
+                       HEP.Data.LHEF.Type
   build-depends:       base >=4.6
                      , attoparsec >=0.12
                      , bytestring >=0.10

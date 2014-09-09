@@ -8,7 +8,7 @@ import           System.Environment              (getArgs)
 import           System.Exit                     (exitFailure)
 import           System.IO
 
-import           HEP.Data.LHEF.Parser            (lhefEvent)
+import           HEP.Data.LHEF
 
 parseAndPrint :: ByteString -> IO ()
 parseAndPrint str = case parse lhefEvent str of
