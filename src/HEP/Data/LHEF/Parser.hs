@@ -29,12 +29,12 @@ eventInfo = do skipSpace
                aqedup' <- double
                skipSpace
                aqcdup' <- double
-               return EventInfo { nup    = nup'
-                                , idprup = idprup'
-                                , xwgtup = xwgtup'
-                                , scalup = scalup'
-                                , aqedup = aqedup'
-                                , aqcdup = aqcdup' }
+               return EventInfo { _nup    = nup'
+                                , _idprup = idprup'
+                                , _xwgtup = xwgtup'
+                                , _scalup = scalup'
+                                , _aqedup = aqedup'
+                                , _aqcdup = aqcdup' }
 
 particle :: Parser Particle
 particle = do skipSpace
@@ -63,13 +63,13 @@ particle = do skipSpace
               vtimup'  <- double
               skipSpace
               spinup'  <- double
-              return Particle { idup   = idup'
-                              , istup  = istup'
-                              , mothup = (mothup1', mothup2')
-                              , icolup = (icolup1', icolup2')
-                              , pup    = (pup1', pup2', pup3', pup4', pup5')
-                              , vtimup = vtimup'
-                              , spinup = spinup' }
+              return Particle { _idup   = idup'
+                              , _istup  = istup'
+                              , _mothup = (mothup1', mothup2')
+                              , _icolup = (icolup1', icolup2')
+                              , _pup    = (pup1', pup2', pup3', pup4', pup5')
+                              , _vtimup = vtimup'
+                              , _spinup = spinup' }
 
 lhefEvent :: Parser Event
 lhefEvent = do skipSpace

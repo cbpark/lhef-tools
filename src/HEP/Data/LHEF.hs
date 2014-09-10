@@ -1,5 +1,3 @@
-{-# LANGUAGE RecordWildCards #-}
-
 module HEP.Data.LHEF
     (
       module HEP.Data.LHEF.Type
@@ -24,6 +22,7 @@ module HEP.Data.LHEF
     )
     where
 
+import           Control.Lens
 import           Control.Monad              (liftM)
 import           Control.Monad.Trans.Reader
 import           Data.Function              (on)
@@ -36,7 +35,7 @@ import           HEP.Data.LHEF.Parser
 import           HEP.Data.LHEF.Type
 
 fourMomentum :: Particle -> LorentzVector Double
-fourMomentum Particle { pup = (x, y, z, e, _) } = lorentzVectorXYZT (x, y, z, e)
+fourMomentum p = lorentzVectorXYZT (p^.pup._1, p^.pup._2, p^.pup._3, p^.pup._4)
 
 momentumSum :: [Particle] -> LorentzVector Double
 momentumSum = vectorSum . map fourMomentum
@@ -68,13 +67,13 @@ dR [p,p'] = Just $ (deltaR `on` fourMomentum) p p'
 dR _      = Nothing
 
 energyOf :: Particle -> Double
-energyOf Particle { pup = (_, _, _, e, _) } = e
+energyOf p = p^.pup._4
 
 idOf :: Particle -> Int
-idOf Particle { .. } = idup
+idOf = view idup
 
 is :: Particle -> ParticleType -> Bool
-p `is` pid = (`elem` getParType pid) . abs . idup $ p
+p `is` pid = (`elem` getParType pid) . abs . (^.idup) $ p
 
 initialStates :: EventEntry -> [Particle]
 initialStates pm = nub $ map (ancenstor pm) (runReader finalStates pm)
@@ -83,12 +82,11 @@ initialStates pm = nub $ map (ancenstor pm) (runReader finalStates pm)
 familyLine :: EventEntry -> Maybe Particle -> [Particle]
 familyLine _  Nothing  = []
 familyLine pm (Just p) = p : familyLine pm (mother pm p)
-    where mother pm' Particle { mothup = (m, _) }
-              | m `elem` [1,2] = Nothing
-              | otherwise      = M.lookup m pm'
+  where mother pm' p' | p'^.mothup._1 `elem` [1,2] = Nothing
+                      | otherwise                  = M.lookup (p'^.mothup._1) pm'
 
 finalStates :: Reader EventEntry [Particle]
-finalStates = liftM M.elems $ asks (M.filter (\Particle { .. } -> istup == 1))
+finalStates = liftM M.elems $ asks (M.filter ((==1) . (^.istup)))
 
 particlesFrom :: ParticleType -> Reader EventEntry [[Particle]]
 particlesFrom pid = asks (M.keys . M.filter (`is` pid)) >>= mapM getDaughters
@@ -96,9 +94,9 @@ particlesFrom pid = asks (M.keys . M.filter (`is` pid)) >>= mapM getDaughters
 getDaughters :: Int -> Reader EventEntry [Particle]
 getDaughters i = do
   pm <- ask
-  daughters <- asks $ M.filter (\Particle { .. } -> fst mothup == i)
+  daughters <- asks $ M.filter ((==i) . (^.mothup._1))
   return $ M.foldrWithKey
-             (\k p acc -> case istup p of
+             (\k p acc -> case p^.istup of
                             1 -> p : acc
                             _ -> runReader (getDaughters k) pm ++ acc) []
              daughters
