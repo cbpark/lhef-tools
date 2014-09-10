@@ -28,7 +28,6 @@ import           Control.Monad              (liftM)
 import           Control.Monad.Trans.Reader
 import           Data.Function              (on)
 import qualified Data.IntMap                as M
-import           Data.List                  (nub)
 
 import           HEP.Vector.LorentzVector
 
@@ -76,16 +75,9 @@ idOf Particle { .. } = idup
 is :: Particle -> ParticleType -> Bool
 p `is` pid = (`elem` getParType pid) . abs . idup $ p
 
-initialStates :: EventEntry -> [Particle]
-initialStates pm = nub $ map (ancenstor pm) (runReader finalStates pm)
-    where ancenstor pm' = last . familyLine pm' . Just
-
-familyLine :: EventEntry -> Maybe Particle -> [Particle]
-familyLine _  Nothing  = []
-familyLine pm (Just p) = p : familyLine pm (mother pm p)
-    where mother pm' Particle { mothup = (m, _) }
-              | m `elem` [1,2] = Nothing
-              | otherwise      = M.lookup m pm'
+initialStates :: Reader EventEntry [Particle]
+initialStates = liftM M.elems $
+                asks (M.filter (\Particle { .. } -> mothup == (1, 2)))
 
 finalStates :: Reader EventEntry [Particle]
 finalStates = liftM M.elems $ asks (M.filter (\Particle { .. } -> istup == 1))
