@@ -37,6 +37,6 @@ data Particle = Particle
     , spinup :: Double
     } deriving (Eq, Show)
 
-type ParticleMap = IntMap Particle
-type Event = (EventInfo, ParticleMap)
+type EventEntry = IntMap Particle
+type Event = (EventInfo, EventEntry)
 newtype ParticleType = ParticleType { getParType :: [Int] }

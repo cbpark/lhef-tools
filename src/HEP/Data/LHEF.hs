@@ -76,24 +76,24 @@ idOf Particle { .. } = idup
 is :: Particle -> ParticleType -> Bool
 p `is` pid = (`elem` getParType pid) . abs . idup $ p
 
-initialStates :: ParticleMap -> [Particle]
+initialStates :: EventEntry -> [Particle]
 initialStates pm = nub $ map (ancenstor pm) (runReader finalStates pm)
     where ancenstor pm' = last . familyLine pm' . Just
 
-familyLine :: ParticleMap -> Maybe Particle -> [Particle]
+familyLine :: EventEntry -> Maybe Particle -> [Particle]
 familyLine _  Nothing  = []
 familyLine pm (Just p) = p : familyLine pm (mother pm p)
     where mother pm' Particle { mothup = (m, _) }
               | m `elem` [1,2] = Nothing
               | otherwise      = M.lookup m pm'
 
-finalStates :: Reader ParticleMap [Particle]
+finalStates :: Reader EventEntry [Particle]
 finalStates = liftM M.elems $ asks (M.filter (\Particle { .. } -> istup == 1))
 
-particlesFrom :: ParticleType -> Reader ParticleMap [[Particle]]
+particlesFrom :: ParticleType -> Reader EventEntry [[Particle]]
 particlesFrom pid = asks (M.keys . M.filter (`is` pid)) >>= mapM getDaughters
 
-getDaughters :: Int -> Reader ParticleMap [Particle]
+getDaughters :: Int -> Reader EventEntry [Particle]
 getDaughters i = do
   pm <- ask
   daughters <- asks $ M.filter (\Particle { .. } -> fst mothup == i)
