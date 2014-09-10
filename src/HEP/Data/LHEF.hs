@@ -30,14 +30,13 @@ import           Data.Function              (on)
 import qualified Data.IntMap                as M
 import           Data.List                  (nub)
 
-import           HEP.Vector
 import           HEP.Vector.LorentzVector
 
 import           HEP.Data.LHEF.Parser
 import           HEP.Data.LHEF.Type
 
 fourMomentum :: Particle -> LorentzVector Double
-fourMomentum Particle { pup = (x, y, z, e, _) } = LorentzVector e x y z
+fourMomentum Particle { pup = (x, y, z, e, _) } = lorentzVectorXYZT (x, y, z, e)
 
 momentumSum :: [Particle] -> LorentzVector Double
 momentumSum = vectorSum . map fourMomentum
