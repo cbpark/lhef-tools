@@ -39,7 +39,6 @@ executable lhef_parse_test
 executable lhef_conduitparse_test
   main-is:             conduitparse.hs
   build-depends:       base >=4.6
-                     , attoparsec >=0.12
                      , conduit >=1.2
                      , conduit-extra >=1.1
                      , resourcet >=1.1

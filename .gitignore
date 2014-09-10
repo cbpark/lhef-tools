@@ -6,3 +6,4 @@ cabal.sandbox.config
 .#*
 .*.swp
 *.lhe
+*.old
