@@ -35,7 +35,7 @@ import           HEP.Data.LHEF.Parser
 import           HEP.Data.LHEF.Type
 
 fourMomentum :: Particle -> LorentzVector Double
-fourMomentum Particle { pup = (x, y, z, e, _) } = lorentzVectorXYZT (x, y, z, e)
+fourMomentum Particle { pup = (x, y, z, e, _) } = setXYZT x y z e
 
 momentumSum :: [Particle] -> LorentzVector Double
 momentumSum = vectorSum . map fourMomentum
