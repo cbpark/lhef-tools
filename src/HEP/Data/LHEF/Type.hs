@@ -3,7 +3,6 @@ module HEP.Data.LHEF.Type where
 import           Data.IntMap              (IntMap)
 import           HEP.Vector               (HasFourMomentum (..))
 import           HEP.Vector.LorentzVector (setXYZT)
-import qualified HEP.Vector.LorentzVector as LV
 
 data EventInfo = EventInfo
     { -- | Number of particle entries in the event.
@@ -43,9 +42,7 @@ data Particle = Particle
 instance HasFourMomentum Particle where
   fourMomentum (Particle { pup = (x, y, z, e, _) }) = setXYZT x y z e
   pt (Particle { pup = (x, y, _, _, _) }) = sqrt $ x * x + y * y
-  eta = LV.eta . fourMomentum
-  phi = LV.phi . fourMomentum
 
 type EventEntry = IntMap Particle
 type Event = (EventInfo, EventEntry)
-newtype ParticleType = ParticleType { getParType :: [Int] }
+newtype ParticleType = ParticleType { getParType :: [Int] } deriving (Show, Eq)
