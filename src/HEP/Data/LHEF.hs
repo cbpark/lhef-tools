@@ -4,67 +4,25 @@ module HEP.Data.LHEF
     (
       module HEP.Data.LHEF.Type
     , module HEP.Data.LHEF.Parser
+    , module HV
 
-    , cosTheta
-    , dR
     , energyOf
-    , fourMomentum
-    , finalStates
-    , getDaughters
     , idOf
-    , initialStates
-    , invMass
     , is
+    , finalStates
+    , initialStates
+    , getDaughters
     , particlesFrom
-    , rapidity
-    , transMass
-    , transMassOne
-    , transMomentum
-    , transMomentumOne
     )
     where
 
 import           Control.Monad              (liftM)
 import           Control.Monad.Trans.Reader
-import           Data.Function              (on)
 import qualified Data.IntMap                as M
-
-import           HEP.Vector.LorentzVector
 
 import           HEP.Data.LHEF.Parser
 import           HEP.Data.LHEF.Type
-
-fourMomentum :: Particle -> LorentzVector Double
-fourMomentum Particle { pup = (x, y, z, e, _) } = setXYZT x y z e
-
-momentumSum :: [Particle] -> LorentzVector Double
-momentumSum = vectorSum . map fourMomentum
-
-invMass :: [Particle] -> Double
-invMass = invariantMass . momentumSum
-
-transMass :: [Particle] -> Particle -> Double
-transMass ps k = transverseMass (momentumSum ps) (fourMomentum k)
-
-transMassOne :: Particle -> Particle -> Double
-transMassOne = transverseMass `on` fourMomentum
-
-transMomentum :: [Particle] -> Double
-transMomentum = pT . momentumSum
-
-transMomentumOne :: Particle -> Double
-transMomentumOne = pT . fourMomentum
-
-rapidity :: Particle -> Double
-rapidity = eta . fourMomentum
-
-cosTheta :: [Particle] -> Maybe Double
-cosTheta [p,p'] = Just . cos $ (deltaTheta `on` fourMomentum) p p'
-cosTheta _      = Nothing
-
-dR :: [Particle] -> Maybe Double
-dR [p,p'] = Just $ (deltaR `on` fourMomentum) p p'
-dR _      = Nothing
+import           HEP.Vector                 as HV (HasFourMomentum (..))
 
 energyOf :: Particle -> Double
 energyOf Particle { pup = (_, _, _, e, _) } = e
