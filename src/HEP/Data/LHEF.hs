@@ -5,6 +5,8 @@ module HEP.Data.LHEF
       module HEP.Data.LHEF.Type
     , module HEP.Data.LHEF.Parser
     , module HV
+    , module LV
+    , module TV
 
     , energyOf
     , idOf
@@ -20,9 +22,12 @@ import           Control.Monad              (liftM)
 import           Control.Monad.Trans.Reader
 import qualified Data.IntMap                as M
 
+import           HEP.Vector                 as HV (HasFourMomentum (..))
+import           HEP.Vector.LorentzTVector  as TV (setXYM)
+import           HEP.Vector.LorentzVector   as LV (setEtaPhiPtM, setXYZT)
+
 import           HEP.Data.LHEF.Parser
 import           HEP.Data.LHEF.Type
-import           HEP.Vector                 as HV (HasFourMomentum (..))
 
 energyOf :: Particle -> Double
 energyOf Particle { pup = (_, _, _, e, _) } = e
