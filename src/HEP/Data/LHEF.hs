@@ -15,8 +15,7 @@ module HEP.Data.LHEF
     , initialStates
     , getDaughters
     , particlesFrom
-    )
-    where
+    ) where
 
 import           Control.Monad              (liftM)
 import           Control.Monad.Trans.Reader
@@ -40,7 +39,7 @@ p `is` pid = (`elem` getParType pid) . abs . idup $ p
 
 initialStates :: Reader EventEntry [Particle]
 initialStates = liftM M.elems $
-                asks (M.filter (\Particle { .. } -> mothup == (1, 2)))
+                asks (M.filter (\Particle { .. } -> fst mothup == 1))
 
 finalStates :: Reader EventEntry [Particle]
 finalStates = liftM M.elems $ asks (M.filter (\Particle { .. } -> istup == 1))
