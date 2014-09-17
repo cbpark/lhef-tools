@@ -20,6 +20,7 @@ module HEP.Data.LHEF
 import           Control.Monad              (liftM)
 import           Control.Monad.Trans.Reader
 import qualified Data.IntMap                as M
+import           Data.Sequence              (Seq, empty, (<|), (><))
 
 import           HEP.Vector                 as HV (HasFourMomentum (..))
 import           HEP.Vector.LorentzTVector  as TV (setXYM)
@@ -44,15 +45,15 @@ initialStates = liftM M.elems $
 finalStates :: Reader EventEntry [Particle]
 finalStates = liftM M.elems $ asks (M.filter (\Particle { .. } -> istup == 1))
 
-particlesFrom :: ParticleType -> Reader EventEntry [[Particle]]
+particlesFrom :: ParticleType -> Reader EventEntry [Seq Particle]
 particlesFrom pid = asks (M.keys . M.filter (`is` pid)) >>= mapM getDaughters
 
-getDaughters :: Int -> Reader EventEntry [Particle]
+getDaughters :: Int -> Reader EventEntry (Seq Particle)
 getDaughters i = do
   pm <- ask
   daughters <- asks $ M.filter (\Particle { .. } -> fst mothup == i)
   return $ M.foldrWithKey
              (\k p acc -> case istup p of
-                            1 -> p : acc
-                            _ -> runReader (getDaughters k) pm ++ acc) []
+                            1 -> p <| acc
+                            _ -> runReader (getDaughters k) pm >< acc) empty
              daughters
