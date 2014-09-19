@@ -1,4 +1,16 @@
 {-# LANGUAGE RecordWildCards #-}
+--------------------------------------------------------------------------------
+-- |
+-- Module      :  HEP.Data.LHEF
+-- Copyright   :  (c) 2014 Chan Beom Park
+-- License     :  BSD-style
+-- Maintainer  :  Chan Beom Park <cbpark@gmail.com>
+-- Stability   :  experimental
+-- Portability :  GHC
+--
+-- Helper functions to use in analyses of LHEF data files.
+--
+--------------------------------------------------------------------------------
 
 module HEP.Data.LHEF
     (
