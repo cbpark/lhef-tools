@@ -2,7 +2,7 @@
 --------------------------------------------------------------------------------
 -- |
 -- Module      :  HEP.Data.LHEF
--- Copyright   :  (c) 2014 Chan Beom Park
+-- Copyright   :  (c) 2014 - 2015 Chan Beom Park
 -- License     :  BSD-style
 -- Maintainer  :  Chan Beom Park <cbpark@gmail.com>
 -- Stability   :  experimental
@@ -16,7 +16,7 @@ module HEP.Data.LHEF
     (
       module LT
     , module LP
-    , module HV
+    , module HK
     , module LV
     , module TV
 
@@ -29,17 +29,18 @@ module HEP.Data.LHEF
     , particlesFrom
     ) where
 
-import           Control.Monad              (liftM)
+import           Control.Monad                        (liftM)
 import           Control.Monad.Trans.Reader
-import qualified Data.IntMap                as M
-import           Data.Sequence              (Seq, empty, (<|), (><))
+import qualified Data.IntMap                          as M
+import           Data.Sequence                        (Seq, empty, (<|), (><))
 
-import           HEP.Vector                 as HV
-import           HEP.Vector.LorentzTVector  as TV (setXYM)
-import           HEP.Vector.LorentzVector   as LV (setEtaPhiPtM, setXYZT)
+import           HEP.Kinematics                       as HK
+import           HEP.Kinematics.Vector.LorentzTVector as TV (setXYM)
+import           HEP.Kinematics.Vector.LorentzVector  as LV (setEtaPhiPtM,
+                                                             setXYZT)
 
-import           HEP.Data.LHEF.Parser       as LP
-import           HEP.Data.LHEF.Type         as LT
+import           HEP.Data.LHEF.Parser                 as LP
+import           HEP.Data.LHEF.Type                   as LT
 
 energyOf :: Particle -> Double
 energyOf Particle { pup = (_, _, _, e, _) } = e

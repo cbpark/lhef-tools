@@ -1,8 +1,8 @@
 module HEP.Data.LHEF.Type where
 
-import           Data.IntMap              (IntMap)
-import           HEP.Vector               (HasFourMomentum (..))
-import           HEP.Vector.LorentzVector (setXYZT)
+import           Data.IntMap                         (IntMap)
+import           HEP.Kinematics                      (HasFourMomentum (..))
+import           HEP.Kinematics.Vector.LorentzVector (setXYZT)
 
 data EventInfo = EventInfo
     { nup    :: Int    -- ^ Number of particle entries in the event.
