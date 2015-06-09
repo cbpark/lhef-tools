@@ -7,7 +7,6 @@ module HEP.Data.LHEF.Parser
     , stripLHEF
     ) where
 
-import           Control.Applicative              ((<*))
 import           Data.Attoparsec.ByteString       (skipWhile)
 import           Data.Attoparsec.ByteString.Char8 hiding (skipWhile)
 import           Data.ByteString.Lazy.Char8       (ByteString)

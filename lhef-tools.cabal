@@ -24,7 +24,7 @@ library
   exposed-modules:     HEP.Data.LHEF
                        HEP.Data.LHEF.Parser
                        HEP.Data.LHEF.Type
-  build-depends:       base >=4.6
+  build-depends:       base >=4.8
                      , attoparsec >=0.12
                      , bytestring >=0.10
                      , containers >=0.5
@@ -36,7 +36,7 @@ library
 
 executable lhef_parse_test
   main-is:             testparse.hs
-  build-depends:       base >=4.6
+  build-depends:       base >=4.8
                      , attoparsec >=0.12
                      , bytestring >=0.10
                      , lhef-tools
@@ -50,7 +50,7 @@ executable lhef_parse_test
 
 executable lhef_conduitparse_test
   main-is:             conduitparse.hs
-  build-depends:       base >=4.6
+  build-depends:       base >=4.8
                      , conduit >=1.2
                      , conduit-extra >=1.1
                      , resourcet >=1.1
