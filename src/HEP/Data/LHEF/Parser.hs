@@ -4,14 +4,18 @@ module HEP.Data.LHEF.Parser
     (
       lhefEvent
     , lhefEvents
+    , getLHEFEvent
     , stripLHEF
     ) where
 
+import           Control.Monad.Trans.State.Strict
 import           Data.Attoparsec.ByteString       (skipWhile)
 import           Data.Attoparsec.ByteString.Char8 hiding (skipWhile)
-import           Data.ByteString.Lazy.Char8       (ByteString)
+import           Data.ByteString.Char8            (ByteString)
 import qualified Data.ByteString.Lazy.Char8       as C
 import           Data.IntMap                      (fromList)
+import           Pipes
+import qualified Pipes.Attoparsec                 as PA
 
 import           HEP.Data.LHEF.Type
 
@@ -81,10 +85,17 @@ lhefEvent = do skipSpace
                return (evInfo, fromList $ zip [1..] parEntries)
   where opEvInfo = many' $ char '#' >> skipTillEnd
         finalLine = many' $ string "</LesHouchesEvents>" >> endOfLine
-        skipTillEnd = skipWhile (not . isEndOfLine) >> endOfLine
+
+skipTillEnd :: Parser ()
+skipTillEnd = skipWhile (not . isEndOfLine) >> endOfLine
 
 lhefEvents :: Parser [Event]
 lhefEvents = string "<LesHouchesEvents version=" >> many1' lhefEvent
 
-stripLHEF :: ByteString -> ByteString
+getLHEFEvent :: MonadIO m => Producer ByteString m () -> Producer Event m ()
+getLHEFEvent s = do (r, s') <- lift $ runStateT (PA.parse lhefEvent) s
+                    case r of Just (Right ev) -> yield ev >> getLHEFEvent s'
+                              _               -> return ()
+
+stripLHEF :: C.ByteString -> C.ByteString
 stripLHEF = C.unlines . init . dropWhile (/="<event>") . C.lines
