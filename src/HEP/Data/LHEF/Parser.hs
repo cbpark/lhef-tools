@@ -21,16 +21,11 @@ import           HEP.Data.LHEF.Type
 
 eventInfo :: Parser EventInfo
 eventInfo = do skipSpace
-               nup'    <- signed decimal
-               skipSpace
-               idprup' <- signed decimal
-               skipSpace
-               xwgtup' <- double
-               skipSpace
-               scalup' <- double
-               skipSpace
-               aqedup' <- double
-               skipSpace
+               nup'    <- signed decimal <* skipSpace
+               idprup' <- signed decimal <* skipSpace
+               xwgtup' <- double         <* skipSpace
+               scalup' <- double         <* skipSpace
+               aqedup' <- double         <* skipSpace
                aqcdup' <- double
                return EventInfo { nup    = nup'
                                 , idprup = idprup'
@@ -41,30 +36,18 @@ eventInfo = do skipSpace
 
 particle :: Parser Particle
 particle = do skipSpace
-              idup'    <- signed decimal
-              skipSpace
-              istup'   <- signed decimal
-              skipSpace
-              mothup1' <- signed decimal
-              skipSpace
-              mothup2' <- signed decimal
-              skipSpace
-              icolup1' <- signed decimal
-              skipSpace
-              icolup2' <- signed decimal
-              skipSpace
-              pup1'    <- double
-              skipSpace
-              pup2'    <- double
-              skipSpace
-              pup3'    <- double
-              skipSpace
-              pup4'    <- double
-              skipSpace
-              pup5'    <- double
-              skipSpace
-              vtimup'  <- double
-              skipSpace
+              idup'    <- signed decimal <* skipSpace
+              istup'   <- signed decimal <* skipSpace
+              mothup1' <- signed decimal <* skipSpace
+              mothup2' <- signed decimal <* skipSpace
+              icolup1' <- signed decimal <* skipSpace
+              icolup2' <- signed decimal <* skipSpace
+              pup1'    <- double         <* skipSpace
+              pup2'    <- double         <* skipSpace
+              pup3'    <- double         <* skipSpace
+              pup4'    <- double         <* skipSpace
+              pup5'    <- double         <* skipSpace
+              vtimup'  <- double         <* skipSpace
               spinup'  <- double
               return Particle { idup   = idup'
                               , istup  = istup'
@@ -92,7 +75,7 @@ skipTillEnd = skipWhile (not . isEndOfLine) >> endOfLine
 lhefEvents :: Parser [Event]
 lhefEvents = string "<LesHouchesEvents version=" >> many1' lhefEvent
 
-getLHEFEvent :: MonadIO m => Producer ByteString m () -> Producer Event m ()
+getLHEFEvent :: Monad m => Producer ByteString m () -> Producer Event m ()
 getLHEFEvent s = do (r, s') <- lift $ runStateT (PA.parse lhefEvent) s
                     case r of Just (Right ev) -> yield ev >> getLHEFEvent s'
                               _               -> return ()
