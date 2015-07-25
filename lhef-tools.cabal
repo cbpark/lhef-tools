@@ -2,7 +2,8 @@ name:                lhef-tools
 version:             0.1.0.0
 synopsis:            Tools for the LHEF analyses
 description:         This package provides simple parsers and functions for manipulating files in the Les Houches Event Format (LHEF).
-homepage:            http://github.com/cbpark/lhef-tools
+homepage:            https://github.com/cbpark/lhef-tools
+bug-reports:         https://github.com/cbpark/lhef-tools/issues
 license:             BSD3
 license-file:        LICENSE
 author:              Chan Beom Park
@@ -31,7 +32,7 @@ library
                      , pipes >=4.1
                      , pipes-attoparsec >=0.5
                      , transformers >=0.3 && <0.5
-                     , hep-kinematics >=0.1
+                     , hep-utilities >=0.1
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:         -Wall -O2 -funbox-strict-fields -fno-warn-unused-do-bind

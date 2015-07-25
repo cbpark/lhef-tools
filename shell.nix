@@ -1,9 +1,8 @@
 with (import <nixpkgs> {}).pkgs;
 let pkg = haskellngPackages.callPackage
             ({ mkDerivation, attoparsec, base, bytestring, conduit
-             , conduit-extra, containers, hep-kinematics, pipes
-             , pipes-attoparsec, pipes-bytestring, resourcet, stdenv
-             , transformers
+             , conduit-extra, containers, hep-utilities, pipes, pipes-attoparsec
+             , pipes-bytestring, resourcet, stdenv, transformers
              }:
              mkDerivation {
                pname = "lhef-tools";
@@ -13,10 +12,10 @@ let pkg = haskellngPackages.callPackage
                isExecutable = true;
                buildDepends = [
                  attoparsec base bytestring conduit conduit-extra containers
-                 hep-kinematics pipes pipes-attoparsec pipes-bytestring resourcet
+                 hep-utilities pipes pipes-attoparsec pipes-bytestring resourcet
                  transformers
                ];
-               homepage = "http://github.com/cbpark/lhef-tools";
+               homepage = "https://github.com/cbpark/lhef-tools";
                description = "Tools for the LHEF analyses";
                license = stdenv.lib.licenses.bsd3;
              }) {};
