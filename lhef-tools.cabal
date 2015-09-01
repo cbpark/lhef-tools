@@ -24,6 +24,7 @@ flag devel
 library
   exposed-modules:     HEP.Data.LHEF
                        HEP.Data.LHEF.Parser
+                       HEP.Data.LHEF.PipesUtil
                        HEP.Data.LHEF.Type
   build-depends:       base >=4.8
                      , attoparsec >=0.12
@@ -31,7 +32,7 @@ library
                      , containers >=0.5
                      , pipes >=4.1
                      , pipes-attoparsec >=0.5
-                     , transformers >=0.3 && <0.5
+                     , transformers >=0.3
                      , hep-utilities >=0.1
   hs-source-dirs:      src
   default-language:    Haskell2010
@@ -57,7 +58,7 @@ executable lhef_conduitparse_test
                      , conduit >=1.2
                      , conduit-extra >=1.1
                      , resourcet >=1.1
-                     , transformers >=0.3 && <0.5
+                     , transformers >=0.3
                      , lhef-tools
   hs-source-dirs:      test
   default-language:    Haskell2010

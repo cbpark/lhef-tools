@@ -19,6 +19,7 @@ module HEP.Data.LHEF
     , module HK
     , module LV
     , module TV
+    , module PI
 
     , energyOf
     , idOf
@@ -35,8 +36,11 @@ import qualified Data.IntMap                          as M
 
 import           HEP.Kinematics                       as HK
 import           HEP.Kinematics.Vector.LorentzTVector as TV (setXYM)
-import           HEP.Kinematics.Vector.LorentzVector  as LV (setEtaPhiPtM,
+import           HEP.Kinematics.Vector.LorentzVector  as LV (LorentzVector (..),
+                                                             emptyLV,
+                                                             setEtaPhiPtM,
                                                              setXYZT)
+import           HEP.Particle.ID                      as PI
 
 import           HEP.Data.LHEF.Parser                 as LP
 import           HEP.Data.LHEF.Type                   as LT
