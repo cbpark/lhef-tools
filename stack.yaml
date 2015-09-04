@@ -1,6 +1,6 @@
 flags: {}
 packages:
 - '.'
-- '../hep-utilities'
+- ../hep-utilities
 extra-deps: []
 resolver: lts-3.4

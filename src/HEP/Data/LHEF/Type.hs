@@ -15,27 +15,27 @@ data EventInfo = EventInfo
 
 data Particle = Particle
     { -- | Particle ID according to Particle Data Group convention.
-      idup   :: !Int
+      idup   :: Int
       -- | Status code.
-    , istup  :: !Int
+    , istup  :: Int
       -- | Index of first and last mother.
-    , mothup :: !(Int, Int)
+    , mothup :: (Int, Int)
       -- | Integer tag for the color flow line passing through the
       -- (anti-)color of the particle.
     , icolup :: (Int, Int)
       -- | Lab frame momentum (P_x, P_y, P_z, E, M) of particle in GeV.
-    , pup    :: !(Double, Double, Double, Double, Double)
+    , pup    :: (Double, Double, Double, Double, Double)
       -- | Invariant lifetime (distance from production to decay) in mm.
     , vtimup :: Double
       -- | Consine of the angle between the spin-vector of particle and
       -- the three-momentum of the decaying particle, specified in the
       -- lab frame.
     , spinup :: Double
-    } deriving (Show)
+    } deriving Show
 
 instance HasFourMomentum Particle where
   fourMomentum (Particle { pup = (x, y, z, e, _) }) = setXYZT x y z e
-  pt (Particle { pup = (x, y, _, _, _) }) = sqrt $! x ** 2 + y ** 2
+  pt (Particle { pup = (x, y, _, _, _) }) = sqrt $ x ** 2 + y ** 2
 
 type EventEntry = IntMap Particle
 type Event = (EventInfo, EventEntry)
