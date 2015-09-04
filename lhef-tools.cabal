@@ -32,6 +32,7 @@ library
                      , containers >=0.5
                      , pipes >=4.1
                      , pipes-attoparsec >=0.5
+                     , pipes-bytestring
                      , transformers >=0.3
                      , hep-utilities >=0.1
   hs-source-dirs:      src

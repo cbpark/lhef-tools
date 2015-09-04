@@ -1,4 +1,6 @@
-flags: {}
+flags:
+  lhef-tools:
+    devel: false
 packages:
 - '.'
 - ../hep-utilities

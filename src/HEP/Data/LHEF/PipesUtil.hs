@@ -13,19 +13,36 @@
 
 module HEP.Data.LHEF.PipesUtil
        (
-         initialStates
+         getLHEFEvent
+       , eventEntry
+       , initialStates
        , finalStates
        , groupByMother
        ) where
 
-import           Control.Monad      (forever)
-import           Data.Function      (on)
-import qualified Data.IntMap        as M
-import           Data.List          (groupBy)
+import           Control.Monad                    (forever)
+import           Control.Monad.Trans.State.Strict
+import           Data.ByteString.Char8            (ByteString)
+import           Data.Function                    (on)
+import qualified Data.IntMap                      as M
+import           Data.List                        (groupBy)
 import           Pipes
-import qualified Pipes.Prelude      as P
+import           Pipes.Attoparsec                 (parse)
+import           Pipes.ByteString                 (fromHandle)
+import qualified Pipes.Prelude                    as P
+import           System.IO                        (Handle)
 
+import           HEP.Data.LHEF.Parser             (lhefEvent)
 import           HEP.Data.LHEF.Type
+
+getLHEFEvent :: Monad m => Producer ByteString m () -> Producer Event m ()
+getLHEFEvent s = do (r, s') <- lift $ runStateT (parse lhefEvent) s
+                    case r of Just (Right ev) -> yield ev >> getLHEFEvent s'
+                              _               -> return ()
+
+eventEntry :: MonadIO m => Handle -> Producer EventEntry m ()
+eventEntry = eventEntry' . fromHandle
+  where eventEntry' s = getLHEFEvent s >-> P.map snd
 
 getParticles :: Monad m => (Particle -> Bool) -> Pipe EventEntry [Particle] m ()
 getParticles f = forever $ particles >-> getSome
