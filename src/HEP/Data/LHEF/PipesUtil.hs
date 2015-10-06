@@ -42,12 +42,12 @@ getLHEFEvent s = do (r, s') <- lift $ runStateT (parse lhefEvent) s
                     case r of Just (Right ev) -> yield ev >> getLHEFEvent s'
                               _               -> return ()
 
-eventEntry :: MonadIO m => (a -> Producer ByteString m ())
-            -> a -> Producer EventEntry m ()
+eventEntry :: Monad m => (a -> Producer ByteString m ()) -> a
+           -> Producer EventEntry m ()
 eventEntry f = eventEntry' . f
   where eventEntry' s = getLHEFEvent s >-> P.map snd
 
-eventEntryFromBS :: MonadIO m => ByteString -> Producer EventEntry m ()
+eventEntryFromBS :: Monad m => ByteString -> Producer EventEntry m ()
 eventEntryFromBS = eventEntry yield
 
 eventEntryFromHandle :: MonadIO m => Handle -> Producer EventEntry m ()
