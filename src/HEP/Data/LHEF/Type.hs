@@ -35,7 +35,23 @@ data Particle = Particle
 
 instance HasFourMomentum Particle where
   fourMomentum (Particle { pup = (x, y, z, e, _) }) = setXYZT x y z e
+  {-# INLINE fourMomentum #-}
   pt (Particle { pup = (x, y, _, _, _) }) = sqrt $ x ** 2 + y ** 2
+  {-# INLINE pt #-}
+  epxpypz (Particle { pup = (x, y, z, e, _) }) = (e, x, y, z)
+  {-# INLINE epxpypz #-}
+  pxpypz (Particle { pup = (x, y, z, _, _) }) = (x, y, z)
+  {-# INLINE pxpypz #-}
+  pxpy (Particle { pup = (x, y, _, _, _) }) = (x, y)
+  {-# INLINE pxpy #-}
+  px (Particle { pup = (x, _, _, _, _) }) = x
+  {-# INLINE px #-}
+  py (Particle { pup = (_, y, _, _, _) }) = y
+  {-# INLINE py #-}
+  pz (Particle { pup = (_, _, z, _, _) }) = z
+  {-# INLINE pz #-}
+  energy (Particle { pup = (_, _, _, e, _) }) = e
+  {-# INLINE energy #-}
 
 type EventEntry = IntMap Particle
 type Event = (EventInfo, EventEntry)
