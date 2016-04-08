@@ -14,13 +14,13 @@ import           HEP.Data.LHEF
 
 main :: IO ()
 main = do
-  args <- getArgs
-  when (length args /= 1) $ do
-         putStrLn "Usage: lhef_conduitparse_test filename"
-         exitFailure
+    args <- getArgs
+    when (length args /= 1) $ do
+           putStrLn "Usage: lhef_conduitparse_test filename"
+           exitFailure
 
-  let infile = head args
-  putStrLn $ "-- Parsing " ++ show infile ++ "."
-  runResourceT $
-    CB.sourceFile infile $$ conduitParser lhefEvent =$
-    CL.mapM_ (liftIO . print . snd)
+    let infile = head args
+    putStrLn $ "-- Parsing " ++ show infile ++ "."
+    runResourceT $
+      CB.sourceFile infile $$ conduitParser lhefEvent =$
+      CL.mapM_ (liftIO . print . snd)

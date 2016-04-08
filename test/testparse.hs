@@ -11,19 +11,20 @@ import           System.IO
 import           HEP.Data.LHEF
 
 parseAndPrint :: ByteString -> IO ()
-parseAndPrint str = case parse lhefEvent str of
-                     Fail r _ _               -> C.putStrLn r
-                     Done evRemained evParsed -> do print evParsed
-                                                    parseAndPrint evRemained
+parseAndPrint str =
+    case parse lhefEvent str of
+        Fail r _ _               -> C.putStrLn r
+        Done evRemained evParsed -> do print evParsed
+                                       parseAndPrint evRemained
 
 main :: IO ()
 main = do
-  args <- getArgs
-  when (length args /= 1) $ do
-         putStrLn "Usage: lhef_test_parse filename"
-         exitFailure
+    args <- getArgs
+    when (length args /= 1) $ do
+           putStrLn "Usage: lhef_test_parse filename"
+           exitFailure
 
-  let infile = head args
-  putStrLn $ "-- Parsing " ++ show infile ++ "."
-  withFile infile ReadMode $ \inh -> do evstr <- C.hGetContents inh
-                                        parseAndPrint evstr
+    let infile = head args
+    putStrLn $ "-- Parsing " ++ show infile ++ "."
+    withFile infile ReadMode $ \inh -> do evstr <- C.hGetContents inh
+                                          parseAndPrint evstr
