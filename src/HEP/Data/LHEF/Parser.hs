@@ -5,6 +5,7 @@ module HEP.Data.LHEF.Parser
       lhefEvent
     , lhefEvents
     , stripLHEF
+    , skipTillEnd
     ) where
 
 import           Data.Attoparsec.ByteString       (skipWhile)
