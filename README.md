@@ -1,6 +1,8 @@
 lhef-tools
 ==========
 
+**DEPRECATED** Use [lhevent](https://github.com/cbpark/lhevent).
+
 Tools for the LHEF analyses using Haskell. If you want to use C++, see [CLHEF](https://github.com/cbpark/CLHEF).
 
 ## References
